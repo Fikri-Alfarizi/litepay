@@ -51,6 +51,16 @@ class AdminFrontendController extends Controller
         return view('admin_pro.balance');
     }
 
+    public function topUp()
+    {
+        return view('admin_pro.finance.top_up');
+    }
+
+    public function withdraw()
+    {
+        return view('admin_pro.finance.withdraw');
+    }
+
     public function promo()
     {
         return view('admin_pro.promo');

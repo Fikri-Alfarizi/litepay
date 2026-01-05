@@ -7,13 +7,13 @@
             <p class="text-gray-500 mt-1">Manage your funds and payouts.</p>
         </div>
         <div class="flex space-x-3">
-             <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow transition flex items-center space-x-2 font-medium">
+             <a href="{{ route('admin_pro.balance.top_up') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow transition flex items-center space-x-2 font-medium">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 <span>Top Up</span>
-            </button>
-             <button class="bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg shadow-sm hover:bg-gray-50 font-medium">
+            </a>
+             <a href="{{ route('admin_pro.balance.withdraw') }}" class="bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg shadow-sm hover:bg-gray-50 font-medium">
                 Withdraw
-            </button>
+            </a>
         </div>
     </div>
 

@@ -28,6 +28,8 @@ Route::prefix('admin-pro')->name('admin_pro.')->group(function () {
     Route::get('/settlements', [\App\Http\Controllers\AdminFrontendController::class, 'settlements'])->name('settlements');
     Route::get('/risk', [\App\Http\Controllers\AdminFrontendController::class, 'risk'])->name('risk');
     Route::get('/balance', [\App\Http\Controllers\AdminFrontendController::class, 'balance'])->name('balance');
+    Route::get('/balance/top-up', [\App\Http\Controllers\AdminFrontendController::class, 'topUp'])->name('balance.top_up');
+    Route::get('/balance/withdraw', [\App\Http\Controllers\AdminFrontendController::class, 'withdraw'])->name('balance.withdraw');
     Route::get('/promo', [\App\Http\Controllers\AdminFrontendController::class, 'promo'])->name('promo');
     
     // Account Group
