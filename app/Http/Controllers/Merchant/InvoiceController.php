@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\Merchant;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use App\Services\PaymentService;
 
 class InvoiceController extends Controller
 {
     public function index()
     {
         $merchant = Auth::user()->merchant;
-        $invoices = $merchant->transactions()->latest()->paginate(10); // Treating transactions as "Invoices" for list
+        if (!$merchant)
+            abort(403);
+
+        $invoices = $merchant->transactions()->latest()->paginate(10);
         return view('merchant.invoices.index', compact('invoices'));
     }
 
@@ -20,33 +26,40 @@ class InvoiceController extends Controller
         return view('merchant.invoices.create');
     }
 
-    public function store(\Illuminate\Http\Request $request, \App\Services\PaymentService $paymentService)
+    public function store(Request $request, \App\Services\PaymentService $paymentService)
     {
         $request->validate([
             'amount' => 'required|numeric|min:1000',
-            // Invoice ID usually auto-generated or manual? Let's say manual or auto.
-            // Simplified: User inputs amount, we generate invoice/transaction.
+            'customer_email' => 'nullable|email',
+            'description' => 'nullable|string',
         ]);
-        
-        $merchant = Auth::user()->merchant;
-        // Generate a random invoice ID for UI created invoices
-        $invoiceId = 'INV-' . time(); 
 
-        $paymentService->createTransaction($merchant, [
+        $merchant = Auth::user()->merchant;
+        if (!$merchant)
+            abort(403);
+
+        $invoiceId = 'INV-' . strtoupper(Str::random(10));
+
+        // Use upstream PaymentService to create transaction
+        $transaction = $paymentService->createTransaction($merchant, [
             'invoice_id' => $invoiceId,
             'amount' => $request->amount,
-            'payment_channel' => 'manual_link'
+            'payment_channel' => 'auto_detect', // Or 'manual_link'
         ]);
 
-        return redirect()->route('merchant.invoices.index')->with('success', 'Invoice created');
+        // Note: The upstream service generates its own reference_id (e.g. random 12 chars)
+        // We can redirect to the show page using that transaction model.
+
+        return redirect()->route('merchant.invoices.show', $transaction)->with('success', 'Invoice created successfully.');
     }
 
-    public function detail(\App\Models\Transaction $invoice) // binding to transaction model
+    public function show(Transaction $transaction)
     {
-        // Authorization check
-        if ($invoice->merchant_id !== Auth::user()->merchant->id) {
+        $user = Auth::user();
+        if (!$user->merchant || $transaction->merchant_id !== $user->merchant->id) {
             abort(403);
         }
-        return view('merchant.invoices.detail', compact('invoice'));
+
+        return view('merchant.invoices.show', compact('transaction'));
     }
 }

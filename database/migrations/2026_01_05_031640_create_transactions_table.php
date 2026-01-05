@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('payment_channel')->default('virtual_account'); // e.g., VA, QRIS
             $table->string('status')->default('PENDING'); // PENDING, SUCCESS, FAILED, EXPIRED
             $table->timestamp('paid_at')->nullable();
-            $table->string('reference_id')->nullable(); // External ref
+            $table->string('reference_id')->nullable(); 
             $table->timestamps();
         });
     }
