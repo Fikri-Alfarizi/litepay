@@ -19,4 +19,18 @@ class PaymentService
             'reference_id' => Str::upper(Str::random(12)), // Simulation reference
         ]);
     }
+    public function updateStatus(Transaction $transaction, string $status)
+    {
+        if ($transaction->status === 'SUCCESS' || $transaction->status === 'FAILED') {
+            return; // Immutable terminal states
+        }
+
+        $transaction->update([
+            'status' => $status,
+            'paid_at' => $status === 'SUCCESS' ? now() : null,
+        ]);
+
+        // Dispatch Callback
+        \App\Jobs\SendCallbackJob::dispatch($transaction);
+    }
 }

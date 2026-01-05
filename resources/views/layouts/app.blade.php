@@ -17,6 +17,25 @@
                         <div class="shrink-0 flex items-center">
                             <a href="#" class="font-bold text-xl text-indigo-600">Payment Gateway Lite</a>
                         </div>
+                        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">
+                            @if(auth()->check() && auth()->user()->role === 'admin')
+                                <a href="{{ route('admin.dashboard') }}" class="text-gray-900 hover:text-indigo-600 px-3 py-2">Dashboard</a>
+                                <a href="{{ route('admin.merchants.index') }}" class="text-gray-500 hover:text-indigo-600 px-3 py-2">Merchants</a>
+                                <a href="{{ route('admin.transactions.index') }}" class="text-gray-500 hover:text-indigo-600 px-3 py-2">Transactions</a>
+                            @elseif(auth()->check() && auth()->user()->role === 'merchant')
+                                <a href="{{ route('merchant.dashboard') }}" class="text-gray-900 hover:text-indigo-600 px-3 py-2">Dashboard</a>
+                                <a href="{{ route('merchant.invoices.index') }}" class="text-gray-500 hover:text-indigo-600 px-3 py-2">Invoices</a>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        @auth
+                            <span class="mr-4 text-gray-600">{{ auth()->user()->name }}</span>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="text-red-600 hover:text-red-900">Logout</button>
+                            </form>
+                        @endauth
                     </div>
                 </div>
             </div>
