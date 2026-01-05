@@ -1,21 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.mobile')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy {{ $categoryName }} - LitePay</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Outfit', sans-serif;
-        }
-    </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen pb-20">
-
+@section('content')
     <!-- Top Bar -->
     <div class="bg-white shadow-sm p-4 flex items-center sticky top-0 z-10">
         <a href="{{ route('store.index') }}" class="mr-4 text-gray-600">
@@ -27,7 +12,7 @@
         <h1 class="font-bold text-lg text-gray-800">Buy {{ $categoryName }}</h1>
     </div>
 
-    <div class="max-w-md mx-auto p-4">
+    <div class="p-4">
 
         <!-- Input Section -->
         <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
@@ -85,7 +70,7 @@
 
             <!-- Sticky Bottom Action Bar -->
             <div id="bottomBar"
-                class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg transform translate-y-full transition-transform duration-300 z-50">
+                class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg transform translate-y-full transition-transform duration-300 z-[60]">
                 <div class="max-w-md mx-auto flex justify-between items-center">
                     <div>
                         <div class="text-xs text-gray-500">Total Payment</div>
@@ -100,63 +85,62 @@
         </form>
 
     </div>
+@endsection
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const inputField = document.querySelector('#identifierInput');
-            const hiddenIdentifier = document.querySelector('#hiddenIdentifier');
-            const hiddenProduct = document.querySelector('#hiddenProductName');
-            const hiddenAmount = document.querySelector('#hiddenAmount');
-            const bottomBar = document.querySelector('#bottomBar');
-            const totalPriceEl = document.querySelector('#totalPrice');
-            const continueBtn = document.querySelector('#continueBtn');
-            const cards = document.querySelectorAll('.product-card');
+@stack('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputField = document.querySelector('#identifierInput');
+        const hiddenIdentifier = document.querySelector('#hiddenIdentifier');
+        const hiddenProduct = document.querySelector('#hiddenProductName');
+        const hiddenAmount = document.querySelector('#hiddenAmount');
+        const bottomBar = document.querySelector('#bottomBar');
+        const totalPriceEl = document.querySelector('#totalPrice');
+        const continueBtn = document.querySelector('#continueBtn');
+        const cards = document.querySelectorAll('.product-card');
 
-            let selectedProduct = null;
+        let selectedProduct = null;
 
-            // Expose selectProduct to global scope
-            window.selectProduct = function (element, name, amount) {
-                // Deselect all
-                cards.forEach(card => {
-                    card.classList.remove('border-blue-500', 'bg-blue-50');
-                    card.querySelector('.check-icon').classList.add('hidden');
-                });
+        // Expose selectProduct to global scope
+        window.selectProduct = function (element, name, amount) {
+            // Deselect all
+            cards.forEach(card => {
+                card.classList.remove('border-blue-500', 'bg-blue-50');
+                card.querySelector('.check-icon').classList.add('hidden');
+            });
 
-                // Select clicked
-                element.classList.add('border-blue-500', 'bg-blue-50');
-                element.querySelector('.check-icon').classList.remove('hidden');
+            // Select clicked
+            element.classList.add('border-blue-500', 'bg-blue-50');
+            element.querySelector('.check-icon').classList.remove('hidden');
 
-                // Update Data
-                selectedProduct = { name, amount };
-                hiddenProduct.value = name;
-                hiddenAmount.value = amount;
+            // Update Data
+            selectedProduct = { name, amount };
+            hiddenProduct.value = name;
+            hiddenAmount.value = amount;
 
-                // Update UI
-                totalPriceEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
+            // Update UI
+            totalPriceEl.textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
 
-                // Show Bottom Bar
-                bottomBar.classList.remove('translate-y-full');
+            // Show Bottom Bar
+            bottomBar.classList.remove('translate-y-full');
 
-                validateForm();
-            };
+            validateForm();
+        };
 
-            function validateForm() {
-                const identifierValues = inputField.value.trim();
-                const isIdentifierValid = identifierValues.length >= 8;
-                const isProductSelected = selectedProduct !== null;
+        function validateForm() {
+            const identifierValues = inputField.value.trim();
+            const isIdentifierValid = identifierValues.length >= 8;
+            const isProductSelected = selectedProduct !== null;
 
-                hiddenIdentifier.value = identifierValues;
+            hiddenIdentifier.value = identifierValues;
 
-                if (isIdentifierValid && isProductSelected) {
-                    continueBtn.disabled = false;
-                } else {
-                    continueBtn.disabled = true;
-                }
+            if (isIdentifierValid && isProductSelected) {
+                continueBtn.disabled = false;
+            } else {
+                continueBtn.disabled = true;
             }
+        }
 
-            inputField.addEventListener('input', validateForm);
-        });
-    </script>
-</body>
-
-</html>
+        inputField.addEventListener('input', validateForm);
+    });
+</script>

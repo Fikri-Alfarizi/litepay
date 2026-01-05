@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.mobile', ['hideBottomNav' => true])
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay to {{ $transaction->merchant->name }} - LitePay</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen pb-32">
+@section('content')
     <!-- Top Header -->
     <div class="bg-white shadow-sm p-4 sticky top-0 z-10 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -30,7 +16,7 @@
         </div>
     </div>
 
-    <div class="p-4 max-w-lg mx-auto">
+    <div class="p-4">
         <!-- Merchant Info -->
         <div class="bg-white p-4 rounded-xl shadow-sm mb-4 flex items-center gap-4">
             <div class="bg-blue-100 p-3 rounded-full text-blue-600">
@@ -52,7 +38,7 @@
 
             <!-- Payment Methods -->
             <h3 class="font-bold text-gray-800 mb-3 mt-6">Select Payment Method</h3>
-            <div class="space-y-3">
+            <div class="space-y-3 mb-32">
                 <!-- Bank Transfer Option -->
                 <label class="block relative group cursor-pointer">
                     <input type="radio" name="channel" value="bank_transfer" checked class="peer sr-only">
@@ -110,16 +96,12 @@
             </div>
 
             <!-- Sticky Bottom Button -->
-            <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
-                <div class="max-w-lg mx-auto">
-                    <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-full shadow-lg transition active:scale-[0.98]">
-                        Pay IDR {{ number_format($transaction->amount, 0, ',', '.') }}
-                    </button>
-                </div>
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50 max-w-md mx-auto">
+                 <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-full shadow-lg transition active:scale-[0.98]">
+                    Pay IDR {{ number_format($transaction->amount, 0, ',', '.') }}
+                </button>
             </div>
         </form>
     </div>
-</body>
-
-</html>
+@endsection

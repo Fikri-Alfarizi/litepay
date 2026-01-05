@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.mobile', ['hideBottomNav' => true])
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful - LitePay</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen pb-32">
+@section('content')
     <!-- Success Header -->
     <div class="bg-green-500 text-white p-12 text-center relative overflow-hidden">
         <!-- Decor circles -->
@@ -37,7 +23,7 @@
     </div>
 
     <!-- Receipt Details -->
-    <div class="p-4 max-w-lg mx-auto -mt-6 relative z-10">
+    <div class="p-4 -mt-6 relative z-10 pb-32">
         <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
             <div class="text-center border-b border-gray-100 pb-6 mb-6">
                 <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Paid</p>
@@ -74,7 +60,7 @@
     </div>
 
     <!-- Bottom Action Button -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50 max-w-md mx-auto">
         <div class="max-w-lg mx-auto">
             <a href="{{ route('store.index') }}"
                 class="block w-full text-center bg-slate-900 text-white font-bold py-4 rounded-full shadow-lg hover:bg-slate-800 transition duration-300 transform active:scale-[0.98]">
@@ -82,8 +68,6 @@
             </a>
         </div>
     </div>
-</body>
-
-</html>
+@endsection
 
 </html>
