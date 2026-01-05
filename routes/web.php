@@ -119,5 +119,6 @@ Route::prefix('admin-pro')->name('admin_pro.')->group(function () {
     });
 
     Route::get('/settings', [\App\Http\Controllers\AdminFrontendController::class, 'settings'])->name('settings');
+    Route::post('/chatbot/send', [\App\Http\Controllers\AdminPro\ChatbotController::class, 'sendMessage'])->name('chatbot.send');
 });
 
