@@ -10,6 +10,23 @@ Route::get('/', [App\Http\Controllers\StoreController::class, 'index'])->name('s
 Route::get('/buy/{category}', [App\Http\Controllers\StoreController::class, 'showCategory'])->name('store.category');
 Route::post('/buy', [App\Http\Controllers\StoreController::class, 'purchase'])->name('store.purchase');
 
+// Customer Auth & History
+Route::prefix('customer')->name('customer.')->group(function () {
+    Route::middleware('guest')->group(function () {
+        Route::get('login', [App\Http\Controllers\Customer\AuthController::class, 'showLogin'])->name('login');
+        Route::post('login', [App\Http\Controllers\Customer\AuthController::class, 'login'])->name('login.submit');
+        Route::get('register', [App\Http\Controllers\Customer\AuthController::class, 'showRegister'])->name('register');
+        Route::post('register', [App\Http\Controllers\Customer\AuthController::class, 'register'])->name('register.submit');
+    });
+
+    Route::post('logout', [App\Http\Controllers\Customer\AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+    Route::middleware('auth')->group(function () {
+        Route::get('history', [App\Http\Controllers\Customer\HistoryController::class, 'index'])->name('history');
+        Route::get('profile', [App\Http\Controllers\Customer\ProfileController::class, 'index'])->name('profile');
+    });
+});
+
 // Merchant & Admin Dashboard Redirections (Hidden manually for now inside auth logic if you want)
 Route::get('/dashboard', function () {
     return view('dashboard');

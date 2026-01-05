@@ -14,133 +14,111 @@
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+<body class="bg-gray-50 min-h-screen pb-32">
+    <!-- Top Header -->
+    <div class="bg-white shadow-sm p-4 sticky top-0 z-10 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <a href="{{ route('store.index') }}" class="text-gray-500 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </a>
+            <h1 class="font-bold text-lg text-gray-800">Checkout</h1>
+        </div>
+        <div class="text-sm font-semibold text-blue-600">IDR {{ number_format($transaction->amount, 0, ',', '.') }}
+        </div>
+    </div>
 
-        <!-- Left Panel: Order Details -->
-        <div class="bg-slate-900 text-white p-8 md:w-5/12 flex flex-col justify-between">
-            <div>
-                <div class="flex items-center gap-2 mb-8">
-                    <div class="bg-blue-600 p-2 rounded-lg">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xl font-bold tracking-tight">LitePay</span>
-                </div>
-
-                <div class="mb-8">
-                    <p class="text-slate-400 text-sm uppercase tracking-wider mb-2">Pay to</p>
-                    <h2 class="text-2xl font-bold">{{ $transaction->merchant->name }}</h2>
-                    <p class="text-slate-400 text-sm mt-1">{{ $transaction->merchant->user->email }}</p>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center py-4 border-t border-slate-700">
-                        <span class="text-slate-300">Reference</span>
-                        <span class="font-mono text-white">{{ $transaction->reference_id }}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-4 border-t border-slate-700">
-                        <span class="text-slate-300">Total Due</span>
-                        <span class="text-2xl font-bold text-white">IDR
-                            {{ number_format($transaction->amount, 0, ',', '.') }}</span>
-                    </div>
-                </div>
+    <div class="p-4 max-w-lg mx-auto">
+        <!-- Merchant Info -->
+        <div class="bg-white p-4 rounded-xl shadow-sm mb-4 flex items-center gap-4">
+            <div class="bg-blue-100 p-3 rounded-full text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                    </path>
+                </svg>
             </div>
-
-            <div class="mt-8 pt-6 border-t border-slate-700 text-center md:text-left">
-                <a href="#" class="text-xs text-slate-500 hover:text-slate-300 transition flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Cancel Payment
-                </a>
+            <div>
+                <p class="text-xs text-gray-500 uppercase">Merchant</p>
+                <h2 class="font-bold text-gray-800">{{ $transaction->merchant->name }}</h2>
+                <p class="text-xs text-gray-400">{{ $transaction->reference_id }}</p>
             </div>
         </div>
 
-        <!-- Right Panel: Payment Method -->
-        <div class="p-8 md:w-7/12 bg-white">
-            <h3 class="text-xl font-bold text-gray-800 mb-6">Select Payment Method</h3>
+        <form action="{{ route('checkout.process', $transaction->reference_id) }}" method="POST">
+            @csrf
 
-            <form action="{{ route('checkout.process', $transaction->reference_id) }}" method="POST">
-                @csrf
-
-                <div class="space-y-4 mb-8">
-                    <!-- Bank Transfer Option -->
-                    <label
-                        class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
-                        <input type="radio" name="channel" value="bank_transfer" checked class="peer sr-only">
-                        <div class="flex items-center gap-4 w-full">
-                            <div
-                                class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 group-hover:text-blue-600 peer-checked:bg-blue-100 peer-checked:text-blue-600">
+            <!-- Payment Methods -->
+            <h3 class="font-bold text-gray-800 mb-3 mt-6">Select Payment Method</h3>
+            <div class="space-y-3">
+                <!-- Bank Transfer Option -->
+                <label class="block relative group cursor-pointer">
+                    <input type="radio" name="channel" value="bank_transfer" checked class="peer sr-only">
+                    <div
+                        class="bg-white p-4 rounded-xl shadow-sm border-2 border-transparent peer-checked:border-blue-600 peer-checked:bg-blue-50 transition flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gray-100 p-2 rounded-lg text-gray-500">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
                                 </svg>
                             </div>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900 group-hover:text-blue-700">Bank Transfer</h4>
-                                <p class="text-sm text-gray-500">BCA, Mandiri, BRI, BNI</p>
-                            </div>
-                            <div class="peer-checked:block hidden text-blue-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Bank Transfer</h4>
+                                <p class="text-xs text-gray-500">BCA, Mandiri, BRI, BNI</p>
                             </div>
                         </div>
-                        <div
-                            class="absolute inset-0 border-2 border-transparent peer-checked:border-blue-600 rounded-xl pointer-events-none">
+                        <div class="hidden peer-checked:block text-blue-600">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
                         </div>
-                    </label>
+                    </div>
+                </label>
 
-                    <!-- E-Wallet Option -->
-                    <label
-                        class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
-                        <input type="radio" name="channel" value="ewallet" class="peer sr-only">
-                        <div class="flex items-center gap-4 w-full">
-                            <div
-                                class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 group-hover:text-blue-600 peer-checked:bg-blue-100 peer-checked:text-blue-600">
+                <!-- E-Wallet Option -->
+                <label class="block relative group cursor-pointer">
+                    <input type="radio" name="channel" value="ewallet" class="peer sr-only">
+                    <div
+                        class="bg-white p-4 rounded-xl shadow-sm border-2 border-transparent peer-checked:border-blue-600 peer-checked:bg-blue-50 transition flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-gray-100 p-2 rounded-lg text-gray-500">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
                                     </path>
                                 </svg>
                             </div>
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900 group-hover:text-blue-700">QRIS / E-Wallet</h4>
-                                <p class="text-sm text-gray-500">GoPay, OVO, Dana, ShopeePay</p>
-                            </div>
-                            <div class="peer-checked:block hidden text-blue-600">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
+                            <div>
+                                <h4 class="font-bold text-gray-800">QRIS / E-Wallet</h4>
+                                <p class="text-xs text-gray-500">GoPay, OVO, Dana, ShopeePay</p>
                             </div>
                         </div>
-                        <div
-                            class="absolute inset-0 border-2 border-transparent peer-checked:border-blue-600 rounded-xl pointer-events-none">
+                        <div class="hidden peer-checked:block text-blue-600">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
                         </div>
-                    </label>
-                </div>
+                    </div>
+                </label>
+            </div>
 
-                <div class="flex items-center gap-2 mb-6 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                        </path>
-                    </svg>
-                    <span>Payments are secure and encrypted.</span>
+            <!-- Sticky Bottom Button -->
+            <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
+                <div class="max-w-lg mx-auto">
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-full shadow-lg transition active:scale-[0.98]">
+                        Pay IDR {{ number_format($transaction->amount, 0, ',', '.') }}
+                    </button>
                 </div>
-
-                <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 transition duration-300 transform active:scale-[0.98]">
-                    Pay IDR {{ number_format($transaction->amount, 0, ',', '.') }}
-                </button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </body>
 

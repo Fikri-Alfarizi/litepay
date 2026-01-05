@@ -15,6 +15,8 @@ class PaymentService
             'invoice_id' => $data['invoice_id'],
             'amount' => $data['amount'],
             'payment_channel' => $data['payment_channel'] ?? 'virtual_account',
+            'user_id' => $data['user_id'] ?? null,
+            'destination_number' => $data['destination_number'] ?? null,
             'status' => 'PENDING',
             'reference_id' => Str::upper(Str::random(12)), // Simulation reference
         ]);

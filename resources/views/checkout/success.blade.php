@@ -14,53 +14,76 @@
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden relative">
-        <div class="absolute top-0 w-full h-2 bg-green-500"></div>
-        <div class="p-8 text-center">
+<body class="bg-gray-50 min-h-screen pb-32">
+    <!-- Success Header -->
+    <div class="bg-green-500 text-white p-12 text-center relative overflow-hidden">
+        <!-- Decor circles -->
+        <div class="absolute top-0 left-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-x-1/2 -translate-y-1/2">
+        </div>
+        <div
+            class="absolute bottom-0 right-0 w-48 h-48 bg-white opacity-10 rounded-full translate-x-1/3 translate-y-1/3">
+        </div>
+
+        <div class="relative z-10">
             <div
-                class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-bounce">
+                <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
+            <h1 class="text-2xl font-bold mb-1">Payment Successful!</h1>
+            <p class="text-green-100 text-sm">Thank you for your payment.</p>
+        </div>
+    </div>
 
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
-            <p class="text-gray-500 mb-8">Thank you for your payment.</p>
-
-            <div class="bg-gray-50 rounded-xl p-6 mb-8 text-left border border-gray-100">
-                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
-                    <span class="text-gray-500">Amount Paid</span>
-                    <span class="text-xl font-bold text-gray-900">IDR
-                        {{ number_format($transaction->amount, 0, ',', '.') }}</span>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-500 text-sm">Reference ID</span>
-                        <span
-                            class="text-gray-700 text-sm font-mono bg-gray-200 px-2 py-0.5 rounded">{{ $transaction->reference_id }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500 text-sm">Date</span>
-                        <span class="text-gray-700 text-sm">{{ $transaction->updated_at->format('d M Y, H:i') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500 text-sm">Payment Method</span>
-                        <span
-                            class="text-gray-700 text-sm">{{ ucfirst($transaction->payment_channel ?? 'Unknown') }}</span>
-                    </div>
+    <!-- Receipt Details -->
+    <div class="p-4 max-w-lg mx-auto -mt-6 relative z-10">
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <div class="text-center border-b border-gray-100 pb-6 mb-6">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Paid</p>
+                <div class="text-3xl font-bold text-gray-800">IDR {{ number_format($transaction->amount, 0, ',', '.') }}
                 </div>
             </div>
 
-            <a href="/"
-                class="block w-full bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-slate-800 transition duration-300">
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 text-sm">Reference ID</span>
+                    <span
+                        class="font-mono text-gray-700 bg-gray-100 px-2 py-1 rounded text-xs">{{ $transaction->reference_id }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 text-sm">Date & Time</span>
+                    <span
+                        class="text-gray-800 text-sm font-medium">{{ $transaction->updated_at->format('d M Y, H:i') }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 text-sm">Payment Method</span>
+                    <span
+                        class="text-gray-800 text-sm font-medium capitalize">{{ str_replace('_', ' ', $transaction->payment_channel ?? 'Manual') }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-500 text-sm">Merchant</span>
+                    <span class="text-gray-800 text-sm font-medium">{{ $transaction->merchant->name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-gray-400 text-xs">
+            A copy of this receipt has been saved to your history.
+        </div>
+    </div>
+
+    <!-- Bottom Action Button -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
+        <div class="max-w-lg mx-auto">
+            <a href="{{ route('store.index') }}"
+                class="block w-full text-center bg-slate-900 text-white font-bold py-4 rounded-full shadow-lg hover:bg-slate-800 transition duration-300 transform active:scale-[0.98]">
                 Return to Merchant Site
             </a>
         </div>
-        <div class="bg-gray-50 p-4 text-center border-t border-gray-100">
-            <p class="text-xs text-gray-400">Processed securely by LitePay</p>
-        </div>
     </div>
 </body>
+
+</html>
 
 </html>

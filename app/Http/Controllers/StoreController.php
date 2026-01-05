@@ -72,11 +72,9 @@ class StoreController extends Controller
             'invoice_id' => 'INV-' . strtoupper(Str::random(10)),
             'amount' => $request->amount,
             'payment_channel' => 'auto_detect',
+            'user_id' => \Auth::check() ? \Auth::id() : null, // Attach user ID if logged in
+            'destination_number' => $request->identifier, // Save target phone number
         ]);
-
-        // Store the identifier (phone/ID) and product name - simpler to stick it in metadata/description if model allows, 
-        // or just rely on session/logs for this demo since Transaction model might not have 'identifier'.
-        // For now, we proceed to checkout.
 
         return redirect()->route('checkout.show', $transaction->reference_id);
     }

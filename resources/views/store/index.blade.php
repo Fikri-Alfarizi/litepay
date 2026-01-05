@@ -30,17 +30,38 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-blue-100 text-sm">Welcome back,</p>
-                <h1 class="text-2xl font-bold">Example User</h1>
+                <h1 class="text-2xl font-bold">
+                    @auth
+                        {{ Auth::user()->name }}
+                    @else
+                        Guest User
+                    @endauth
+                </h1>
             </div>
-            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center border-2 border-blue-400">
-                <span class="font-bold">EU</span>
+            <div
+                class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center border-2 border-blue-400 overflow-hidden">
+                @auth
+                    <span class="font-bold">{{ substr(Auth::user()->name, 0, 2) }}</span>
+                @else
+                    <svg class="w-6 h-6 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                @endauth
             </div>
         </div>
 
-        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
-            <p class="text-blue-100 text-xs mb-1">LitePay Balance</p>
-            <p class="text-3xl font-bold">Rp 1.500.000</p>
-        </div>
+        @auth
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+                <p class="text-blue-100 text-xs mb-1">LitePay Balance</p>
+                <p class="text-3xl font-bold">Rp 0</p>
+            </div>
+        @else
+            <a href="{{ route('customer.login') }}"
+                class="block bg-white text-blue-600 text-center font-bold py-3 px-4 rounded-xl shadow-md hover:bg-blue-50 transition">
+                Login / Register
+            </a>
+        @endauth
     </div>
 
     <!-- Main Menu -->
@@ -95,7 +116,7 @@
     </div>
 
     <!-- Promo Banner -->
-    <div class="px-6 mt-6">
+    <div class="px-6 mt-6 pb-20">
         <div
             class="bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
             <div class="relative z-10">
@@ -114,32 +135,32 @@
         </div>
     </div>
 
-    <!-- Footer nav (Optional for "App" feel) -->
+    <!-- Footer nav -->
     <div
-        class="fixed bottom-0 w-full bg-white border-t border-gray-200 py-3 px-6 flex justify-between items-center text-xs text-gray-500">
-        <div class="flex flex-col items-center text-blue-600 font-bold">
+        class="fixed bottom-0 w-full bg-white border-t border-gray-200 py-3 px-6 flex justify-between items-center text-xs text-gray-500 z-50">
+        <a href="{{ route('store.index') }}" class="flex flex-col items-center text-blue-600 font-bold">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                 </path>
             </svg>
             Home
-        </div>
-        <div class="flex flex-col items-center">
+        </a>
+        <a href="{{ route('customer.history') }}" class="flex flex-col items-center hover:text-blue-600">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
                 </path>
             </svg>
             History
-        </div>
-        <div class="flex flex-col items-center">
+        </a>
+        <a href="{{ route('customer.profile') }}" class="flex flex-col items-center hover:text-blue-600">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
             Profile
-        </div>
+        </a>
     </div>
 </body>
 

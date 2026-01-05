@@ -49,4 +49,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Merchant::class);
     }
+
+    public function customerTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    public function isCustomer()
+    {
+        return $this->role === 'customer';
+    }
 }
