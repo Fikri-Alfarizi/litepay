@@ -1,0 +1,173 @@
+Payment Gateway Lite adalah sebuah sistem perangkat lunak yang berfungsi sebagai perantara transaksi pembayaran antara aplikasi milik merchant dan proses pembayaran itu sendiri. Sistem ini tidak berperan sebagai bank, tidak menyimpan uang asli, dan tidak melakukan settlement dana, melainkan bertugas mengelola alur transaksi secara logis dan aman, mulai dari pembuatan tagihan (invoice), pencatatan transaksi, perubahan status pembayaran, hingga pengiriman notifikasi hasil transaksi kembali ke sistem merchant melalui mekanisme callback atau webhook. Dalam konteks proyek ini, Payment Gateway Lite dibuat sebagai simulasi realistis dari payment gateway industri seperti Midtrans atau Xendit, namun dengan fokus utama pada arsitektur sistem, keamanan, dan konsistensi data, bukan pada integrasi ke lembaga keuangan sungguhan.
+
+Di dalam ekosistem pembayaran digital, payment gateway berada di posisi tengah sebagai middleware. Merchant, yaitu pihak yang memiliki aplikasi atau layanan (misalnya aplikasi toko, aplikasi donasi, atau aplikasi sekolah), akan mengirimkan permintaan pembayaran ke payment gateway. Payment gateway kemudian memproses permintaan tersebut, melakukan validasi keamanan, mencatat transaksi ke dalam sistem, dan menunggu proses pembayaran diselesaikan. Setelah pembayaran dianggap berhasil atau gagal, payment gateway bertanggung jawab untuk memberi tahu merchant secara otomatis melalui callback. Dengan demikian, merchant tidak perlu terus-menerus mengecek status transaksi, karena sistem payment gateway yang aktif mengirimkan informasi tersebut.
+
+Objek terpenting dalam Payment Gateway Lite adalah invoice dan transaction. Invoice merupakan representasi dari sebuah tagihan yang diminta oleh merchant, yang memiliki identitas unik, nominal pembayaran, status, serta batas waktu berlaku. Transaction adalah catatan resmi di dalam sistem payment gateway yang merekam seluruh informasi transaksi tersebut. Dalam sistem transaksi profesional, data transaksi bersifat sangat sensitif dan harus dijaga konsistensinya. Sekali transaksi tercatat, data tersebut tidak boleh dihapus sembarangan dan perubahan statusnya harus mengikuti alur yang ketat. Inilah sebabnya mengapa status transaksi dibatasi secara jelas menjadi PENDING, SUCCESS, FAILED, dan EXPIRED. Status tidak boleh meloncat atau berputar balik, karena hal tersebut akan merusak integritas data dan menimbulkan risiko besar pada sistem keuangan.
+
+Alur kerja Payment Gateway Lite dimulai ketika merchant mengirim permintaan pembuatan pembayaran ke API payment gateway. Permintaan ini berisi informasi penting seperti invoice_id, jumlah pembayaran, serta data keamanan berupa API key dan signature. Sistem payment gateway tidak boleh langsung mempercayai permintaan tersebut. Langkah pertama yang dilakukan adalah validasi keamanan, yaitu memastikan bahwa API key benar-benar terdaftar dan signature yang dikirim sesuai dengan perhitungan yang seharusnya menggunakan API secret milik merchant. Signature ini berfungsi untuk memastikan bahwa data tidak diubah di tengah jalan dan benar-benar berasal dari merchant yang sah.
+
+Setelah validasi berhasil, sistem akan menyimpan transaksi ke dalam database dengan status awal PENDING. Pada tahap ini, transaksi dianggap sah namun belum dibayar. Selanjutnya, dalam versi Lite, proses pembayaran disimulasikan, misalnya dengan aksi manual seperti menekan tombol “Bayar”. Ketika pembayaran disimulasikan berhasil, status transaksi akan berubah menjadi SUCCESS. Perubahan status ini hanya boleh terjadi satu kali dan harus dilindungi dari kemungkinan duplikasi atau race condition, karena dalam sistem nyata kesalahan seperti ini dapat menyebabkan perhitungan saldo yang salah.
+
+Setelah status transaksi berubah, payment gateway akan mengirimkan callback ke URL yang telah didaftarkan oleh merchant. Callback ini berisi data transaksi seperti invoice_id, status akhir, jumlah pembayaran, dan signature baru yang menandakan bahwa data callback tersebut juga aman dan valid. Merchant kemudian akan memproses callback ini untuk memperbarui status pembayaran di sistem mereka sendiri. Di sisi payment gateway, seluruh proses pengiriman callback, termasuk payload yang dikirim dan respon dari merchant, harus dicatat dalam sistem logging. Pencatatan ini sangat penting untuk keperluan audit, troubleshooting, dan pelacakan transaksi apabila terjadi masalah di kemudian hari.
+
+Keamanan merupakan aspek yang membedakan sistem transaksi profesional dengan aplikasi biasa. Payment Gateway Lite menerapkan konsep API key sebagai identitas merchant dan API secret sebagai kunci rahasia yang hanya diketahui oleh merchant dan sistem gateway. Kombinasi ini digunakan untuk menghasilkan signature menggunakan algoritma kriptografi seperti HMAC. Dengan mekanisme ini, sistem dapat memastikan bahwa setiap permintaan dan callback benar-benar valid, tidak dimodifikasi, dan tidak berasal dari pihak yang tidak berwenang. Prinsip ini merupakan standar dasar di hampir semua sistem pembayaran dan switching di industri perbankan dan fintech.
+
+Selain keamanan, prinsip penting lain dalam Payment Gateway Lite adalah idempotensi, atomicity, dan traceability. Idempotensi memastikan bahwa permintaan yang sama tidak menghasilkan transaksi ganda. Atomicity memastikan bahwa perubahan data terjadi secara utuh atau tidak sama sekali. Traceability memastikan bahwa setiap langkah transaksi dapat ditelusuri melalui log yang lengkap. Ketiga prinsip ini adalah fondasi dari sistem transaksi yang andal dan menjadi alasan mengapa proyek ini sangat relevan untuk memahami dunia fintech, payment gateway, dan switching company seperti yang dijalankan oleh perusahaan besar.
+
+Payment Gateway Lite dengan sengaja memiliki batasan yang jelas. Sistem ini tidak menangani uang sungguhan, tidak terhubung dengan bank, dan tidak ditujukan untuk produksi. Batasan ini bukan kelemahan, melainkan desain yang disengaja agar fokus pembelajaran tetap pada arsitektur sistem, alur transaksi, dan pola keamanan. Dengan menyelesaikan proyek ini, seseorang akan memiliki pemahaman yang kuat tentang bagaimana sistem pembayaran bekerja di balik layar, sehingga ketika kelak mengintegrasikan payment gateway sungguhan seperti Midtrans, pemahaman tersebut tidak lagi dangkal.
+
+Secara keseluruhan, Payment Gateway Lite adalah proyek backend yang dirancang untuk melatih cara berpikir engineer sistem transaksi. Proyek ini mengajarkan bagaimana membangun API yang aman, konsisten, dapat diaudit, dan sesuai dengan praktik industri. Hasil akhirnya bukan sekadar aplikasi Laravel, melainkan sebuah sistem simulasi pembayaran yang mencerminkan pola kerja dunia fintech dan perbankan. Jika seseorang memahami dan mampu membangun sistem ini dengan benar, maka ia sudah memiliki fondasi yang sangat kuat untuk melangkah ke sistem transaksi yang lebih kompleks seperti transaction gateway, biller aggregator, dan sistem switching skala nasional.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Payment Gateway Lite yang kita bangun terdiri dari dua wajah utama. Wajah pertama adalah API layer, yang digunakan oleh merchant untuk berkomunikasi dengan sistem payment gateway. Wajah kedua adalah UI (web interface) yang digunakan oleh admin internal dan merchant untuk memantau transaksi, invoice, dan aktivitas sistem. Oleh karena itu, struktur folder harus mampu memisahkan logika bisnis, API, dan tampilan UI, agar sistem tetap rapi, scalable, dan mudah dikembangkan.
+
+STRUKTUR FOLDER UTAMA (LENGKAP & INDUSTRI-STYLE)
+Di level paling atas, struktur Laravel tetap mengikuti standar, namun di dalam folder app kita atur ulang dengan pendekatan modular agar logika transaksi tidak bercampur dengan tampilan.
+
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Api/
+│   │   │   ├── PaymentController.php
+│   │   │   ├── TransactionStatusController.php
+│   │   │   └── CallbackController.php
+│   │   │
+│   │   ├── Admin/
+│   │   │   ├── DashboardController.php
+│   │   │   ├── MerchantController.php
+│   │   │   └── TransactionController.php
+│   │   │
+│   │   └── Merchant/
+│   │       ├── DashboardController.php
+│   │       └── InvoiceController.php
+│   │
+│   ├── Middleware/
+│   │   ├── VerifyApiKey.php
+│   │   ├── VerifySignature.php
+│   │   └── RoleMiddleware.php
+│   │
+│   └── Requests/
+│       ├── CreatePaymentRequest.php
+│       └── CallbackRequest.php
+│
+├── Models/
+│   ├── User.php
+│   ├── Merchant.php
+│   ├── Transaction.php
+│   └── CallbackLog.php
+│
+├── Services/
+│   ├── PaymentService.php
+│   ├── SignatureService.php
+│   ├── CallbackService.php
+│   └── TransactionExpiryService.php
+│
+├── Jobs/
+│   └── SendCallbackJob.php
+│
+├── Console/
+│   └── Commands/
+│       └── ExpireTransactionCommand.php
+│
+└── Helpers/
+    └── ApiResponse.php
+Struktur ini mencerminkan pemisahan yang jelas antara API, admin UI, dan merchant UI, yang merupakan praktik umum di sistem pembayaran profesional.
+
+STRUKTUR ROUTE (API + UI TERPISAH JELAS)
+routes/
+├── api.php
+├── web.php
+├── admin.php
+└── merchant.php
+api.php → endpoint payment gateway untuk merchant (REST API)
+
+web.php → halaman umum (login, home)
+
+admin.php → UI admin internal
+
+merchant.php → dashboard merchant
+
+STRUKTUR DATABASE (INTI SISTEM)
+database/
+├── migrations/
+│   ├── create_users_table.php
+│   ├── create_merchants_table.php
+│   ├── create_transactions_table.php
+│   └── create_callback_logs_table.php
+│
+└── seeders/
+    ├── UserSeeder.php
+    └── MerchantSeeder.php
+Database ini dirancang agar setiap transaksi dapat diaudit, ditelusuri, dan diverifikasi kapan pun dibutuhkan.
+
+STRUKTUR UI (INI BAGIAN YANG KAMU MINTA LENGKAP)
+UI berada di dalam folder resources/views dan dibagi menjadi Admin UI dan Merchant UI, karena kebutuhan keduanya berbeda.
+
+resources/
+├── views/
+│   ├── layouts/
+│   │   ├── app.blade.php
+│   │   └── auth.blade.php
+│   │
+│   ├── auth/
+│   │   ├── login.blade.php
+│   │   └── register.blade.php
+│   │
+│   ├── admin/
+│   │   ├── dashboard.blade.php
+│   │   ├── merchants/
+│   │   │   ├── index.blade.php
+│   │   │   └── show.blade.php
+│   │   ├── transactions/
+│   │   │   ├── index.blade.php
+│   │   │   └── detail.blade.php
+│   │   └── logs/
+│   │       └── callbacks.blade.php
+│   │
+│   └── merchant/
+│       ├── dashboard.blade.php
+│       ├── invoices/
+│       │   ├── create.blade.php
+│       │   ├── index.blade.php
+│       │   └── detail.blade.php
+│       └── transactions/
+│           └── index.blade.php
+PENJELASAN UI ADMIN (FUNGSI & ISI)
+UI Admin berfungsi sebagai pusat kontrol payment gateway. Pada dashboard admin, ditampilkan ringkasan jumlah transaksi, total nominal, transaksi sukses, gagal, dan pending. Admin dapat melihat daftar merchant yang terdaftar, lengkap dengan API key, status aktif, dan callback URL mereka. Selain itu, admin memiliki akses penuh ke seluruh data transaksi, termasuk detail setiap invoice, riwayat perubahan status, serta log callback yang menunjukkan apakah notifikasi ke merchant berhasil atau gagal. UI ini mencerminkan kebutuhan operasional internal seperti yang digunakan di perusahaan payment processor atau switching.
+
+PENJELASAN UI MERCHANT (FUNGSI & ISI)
+UI Merchant adalah antarmuka bagi pihak yang menggunakan payment gateway. Melalui dashboard merchant, pengguna dapat membuat invoice baru, melihat status pembayaran, memantau transaksi yang berhasil atau gagal, serta meninjau histori callback yang dikirim ke sistem mereka. Merchant juga dapat melihat informasi API mereka seperti API key (tanpa secret), dokumentasi endpoint, dan contoh request API. UI ini bertujuan agar merchant tidak hanya bergantung pada API, tetapi juga memiliki visibilitas terhadap aktivitas transaksi mereka.
+
+KENAPA UI INI PENTING?
+UI bukan sekadar pelengkap. Dalam sistem transaksi profesional, UI digunakan untuk monitoring, audit, dan troubleshooting. Ketika terjadi masalah pembayaran, engineer atau admin tidak langsung melihat database, melainkan membuka dashboard untuk melacak transaksi, melihat log callback, dan memastikan alur berjalan sesuai prosedur. Dengan menambahkan UI ke Payment Gateway Lite, proyek ini naik level dari sekadar “API latihan” menjadi simulasi sistem fintech nyata.
+
+KESIMPULAN STRUKTUR
+Dengan struktur folder dan UI seperti ini, Payment Gateway Lite yang kamu bangun:
+
+Terlihat profesional dan terorganisir
+
+Memisahkan logika bisnis, API, dan tampilan
+
+Siap dikembangkan lebih lanjut (transaction gateway, biller, dsb.)
+
+Sangat layak dijadikan portfolio backend fintech
+
+
+
+
+
+
+
+
+PERINTAH :
