@@ -1,59 +1,62 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LitePay Features 🚀
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+LitePay is a comprehensive payment gateway and digital services platform featuring a mobile-first customer experience, a robust merchant dashboard, and an advanced admin panel.
 
-## About Laravel
+## 📱 Customer Storefront (Mobile-Optimized)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The customer-facing application is designed with a "Mobile-First" approach, simulating a native app experience on the web.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*   **App-Like Interface**:
+    *   Wrapped in a mobile-width container (`max-w-md`) for consistent UX across devices.
+    *   **5-Item Bottom Navigation**: Home, History, Scan (Central Floating Action), Inbox, Profile.
+    *   Modern styling with Tailwind CSS and custom fonts (Inter/Outfit).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+*   **Shopping & Transactions**:
+    *   **Homepage**: Quick access to top categories (Pulsa, Data, PLN, Games).
+    *   **Category Flows**: Optimized purchase flows for digital goods (e.g., "Buy Data" with phone number validation).
+    *   **Distraction-Free Checkout**: Dedicated checkout page with hidden navigation to increase conversion focus.
+    *   **Payment Methods**: Support for Bank Transfers (BCA, Mandiri, BRI, BNI) and QRIS/E-Wallets (GoPay, OVO, Dana, ShopeePay).
+    *   **Success Page**: Clear payment receipts with "Return to Merchant" actions.
 
-## Learning Laravel
+*   **User Management**:
+    *   **Authentication**: secure Login/Register for customers.
+    *   **History**: Track recent transactions and statuses.
+    *   **Profile**: Manage account details and settings.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🏢 Merchant Dashboard
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Tools for merchants to manage their business and payments.
 
-## Laravel Sponsors
+*   **Dashboard**: Real-time overview of sales and incoming payments.
+*   **Transaction Management**: View and filter transaction history.
+*   **Invoicing**: Create and manage invoices for customers.
+*   **Integration**: API credentials and documentation.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ⚡ Admin Pro Dashboard
 
-### Premium Partners
+A powerful, high-fidelity dashboard for platform administration.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+*   **Core Management**:
+    *   **Dashboard**: Comprehensive analytics and charts.
+    *   **Merchants**: Onboard and manage merchant accounts (featuring "Add Merchant" modals).
+    *   **Transactions**: Global transaction monitoring.
 
-## Contributing
+*   **Financials**:
+    *   **Balance**: Track platform revenue, top-ups, and withdrawals.
+    *   **Settlements**: Manage payouts to merchants.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+*   **Technical & Security**:
+    *   **API Management**: Manage API keys and permissions.
+    *   **Callbacks**: Monitor payment gateway webhook logs.
+    *   **Risk Management**: Fraud detection and risk scoring.
+    *   **IP Whitelist**: Security controls for admin access.
 
-## Code of Conduct
+*   **AI Assistance**:
+    *   **Chatbot**: Integrated Gemini AI assistant for administrative tasks and data querying.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🛠 Backend & Infrastructure
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+*   **Framework**: Built on Laravel 10/11.
+*   **Authentication**: Multi-guard system separating Customers, Merchants, and Admins.
+*   **API**: RESTful API endpoints for payment processing (`/payment/pay`, `/callback`).
+*   **Database**: MySQL with optimized schema for transactions and logs.
