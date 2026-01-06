@@ -1,107 +1,120 @@
-@extends('layouts.mobile', ['hideBottomNav' => true])
+@extends('layouts.mobile')
 
 @section('content')
-    <!-- Top Header -->
-    <div class="bg-white shadow-sm p-4 sticky top-0 z-10 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <a href="{{ route('store.index') }}" class="text-gray-500 hover:text-gray-800">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-            </a>
-            <h1 class="font-bold text-lg text-gray-800">Checkout</h1>
-        </div>
-        <div class="text-sm font-semibold text-blue-600">IDR {{ number_format($transaction->amount, 0, ',', '.') }}
-        </div>
+<div class="bg-gray-50 min-h-screen pb-20">
+    <!-- Header -->
+    <div class="bg-white shadow-sm px-6 py-4 flex items-center gap-4 sticky top-0 z-50">
+        <a href="{{ route('store.index') }}" class="text-gray-500 hover:text-gray-700">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </a>
+        <h1 class="text-lg font-bold">Payment</h1>
     </div>
 
-    <div class="p-4">
-        <!-- Merchant Info -->
-        <div class="bg-white p-4 rounded-xl shadow-sm mb-4 flex items-center gap-4">
-            <div class="bg-blue-100 p-3 rounded-full text-blue-600">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                    </path>
-                </svg>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 uppercase">Merchant</p>
-                <h2 class="font-bold text-gray-800">{{ $transaction->merchant->name }}</h2>
-                <p class="text-xs text-gray-400">{{ $transaction->reference_id }}</p>
+    <div class="p-6">
+        <!-- Timer -->
+        <div class="bg-orange-50 text-orange-600 px-4 py-3 rounded-xl mb-6 flex justify-between items-center text-sm font-medium">
+            <span>Complete payment in</span>
+            <span id="countdown">23:59:59</span>
+        </div>
+
+        <!-- Amount -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 text-center">
+            <p class="text-gray-500 text-sm mb-1">Total Payment</p>
+            <h2 class="text-3xl font-bold text-gray-800">Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</h2>
+            <div class="mt-4 flex justify-between text-sm text-gray-500 border-t pt-4">
+                <span>Order ID</span>
+                <span class="font-mono text-gray-700">{{ $transaction->invoice_id }}</span>
             </div>
         </div>
 
-        <form action="{{ route('checkout.process', $transaction->reference_id) }}" method="POST">
-            @csrf
-
-            <!-- Payment Methods -->
-            <h3 class="font-bold text-gray-800 mb-3 mt-6">Select Payment Method</h3>
-            <div class="space-y-3 mb-32">
-                <!-- Bank Transfer Option -->
-                <label class="block relative group cursor-pointer">
-                    <input type="radio" name="channel" value="bank_transfer" checked class="peer sr-only">
-                    <div
-                        class="bg-white p-4 rounded-xl shadow-sm border-2 border-transparent peer-checked:border-blue-600 peer-checked:bg-blue-50 transition flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-gray-100 p-2 rounded-lg text-gray-500">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Bank Transfer</h4>
-                                <p class="text-xs text-gray-500">BCA, Mandiri, BRI, BNI</p>
-                            </div>
-                        </div>
-                        <div class="hidden peer-checked:block text-blue-600">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
-                </label>
-
-                <!-- E-Wallet Option -->
-                <label class="block relative group cursor-pointer">
-                    <input type="radio" name="channel" value="ewallet" class="peer sr-only">
-                    <div
-                        class="bg-white p-4 rounded-xl shadow-sm border-2 border-transparent peer-checked:border-blue-600 peer-checked:bg-blue-50 transition flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="bg-gray-100 p-2 rounded-lg text-gray-500">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">QRIS / E-Wallet</h4>
-                                <p class="text-xs text-gray-500">GoPay, OVO, Dana, ShopeePay</p>
-                            </div>
-                        </div>
-                        <div class="hidden peer-checked:block text-blue-600">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
-                </label>
+        <!-- Payment Method (QRIS) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6">
+            <h3 class="font-bold text-gray-800 mb-4">Scan QRIS</h3>
+            <div class="flex flex-col items-center">
+                <div class="bg-gray-100 p-4 rounded-xl mb-4">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $transaction->reference_id }}" alt="QR Code" class="w-48 h-48 mix-blend-multiply">
+                </div>
+                <p class="text-sm text-center text-gray-500">Scan this QR code with any e-wallet or banking app to pay.</p>
             </div>
+        </div>
 
-            <!-- Sticky Bottom Button -->
-            <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50 max-w-md mx-auto">
-                 <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-full shadow-lg transition active:scale-[0.98]">
-                    Pay IDR {{ number_format($transaction->amount, 0, ',', '.') }}
-                </button>
+        <!-- Order Details -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6">
+            <h3 class="font-bold text-gray-800 mb-4">Order Details</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Product</span>
+                    <span class="font-medium text-right">{{ $transaction->product_name ?? 'Digital Product' }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Destination</span>
+                    <span class="font-medium">{{ $transaction->destination_number }}</span>
+                </div>
+                <hr class="border-dashed border-gray-200">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Price</span>
+                    <span>Rp {{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Admin Fee</span>
+                    <span>Rp {{ number_format($transaction->fee, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Tax (11%)</span>
+                    <span>Rp {{ number_format($transaction->tax, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between font-bold text-gray-800 pt-2 border-t mt-2">
+                    <span>Total</span>
+                    <span>Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>
+                </div>
             </div>
-        </form>
+        </div>
+
+        <!-- Simulation Button -->
+        <button onclick="simulatePayment()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition mb-4">
+            Simulate Payment (Dev Only)
+        </button>
+        
+        <a href="{{ route('store.index') }}" class="block text-center text-gray-500 font-medium text-sm">Cancel Transaction</a>
     </div>
+</div>
+
+<script>
+    function simulatePayment() {
+        const btn = document.querySelector('button');
+        btn.disabled = true;
+        btn.innerText = 'Processing...';
+        
+        fetch("{{ route('checkout.simulate', $transaction->reference_id) }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.message === 'Payment Successful') {
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.message);
+                btn.disabled = false;
+                btn.innerText = 'Simulate Payment (Dev Only)';
+            }
+        });
+    }
+
+    // Polling status
+    setInterval(() => {
+        fetch("{{ route('checkout.status', $transaction->reference_id) }}")
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'SUCCESS') {
+                    window.location.reload();
+                }
+            });
+    }, 3000);
+</script>
 @endsection

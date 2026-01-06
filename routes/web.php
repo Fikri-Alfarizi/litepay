@@ -63,28 +63,11 @@ Route::prefix('merchant')->name('merchant.')->group(function () {
 });
 
 // Public Routes (Checkout & Callback)
+// Public Routes (Checkout)
 Route::get('checkout/{reference}', [App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
-Route::post('checkout/{reference}', [App\Http\Controllers\CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('checkout/{reference}/success', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
-
-Route::post('callback', [App\Http\Controllers\CallbackController::class, 'handle'])->name('callback');
-
-// Demo Route for viewing Checkout UI
-Route::get('/purchase-demo', function () {
-    $mockMerchant = new \App\Models\Merchant([
-        'name' => 'Store of the Future',
-    ]);
-    $mockMerchant->setRelation('user', new \App\Models\User(['email' => 'contact@futurestore.com']));
-
-    $transaction = new \App\Models\Transaction([
-        'reference_id' => 'DEMO-' . rand(1000, 9999),
-        'amount' => 150000,
-        'status' => 'pending',
-    ]);
-    $transaction->setRelation('merchant', $mockMerchant);
-
-    return view('checkout.show', compact('transaction'));
-});
+Route::get('checkout/{reference}/status', [App\Http\Controllers\CheckoutController::class, 'checkStatus'])->name('checkout.status');
+Route::post('checkout/{reference}/simulate', [App\Http\Controllers\CheckoutController::class, 'simulatePay'])->name('checkout.simulate');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
@@ -93,16 +76,20 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('/payment/pay/{reference_id}', [PublicPaymentController::class, 'show'])->name('payment.pay');
-Route::post('/payment/pay/{reference_id}', [PublicPaymentController::class, 'process'])->name('payment.process');
-
-// Admin Frontend Showcase Routes
+// Admin Pro Routes (Real Backend)
 Route::prefix('admin-pro')->name('admin_pro.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\AdminFrontendController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\AdminProController::class, 'dashboard'])->name('dashboard');
+    Route::get('/transactions', [\App\Http\Controllers\AdminProController::class, 'transactions'])->name('transactions');
+    Route::get('/callbacks', [\App\Http\Controllers\AdminProController::class, 'callbacks'])->name('callbacks');
+    Route::get('/settings', [\App\Http\Controllers\AdminProController::class, 'settings'])->name('settings');
+
+    // Keep others pointing to frontend controller if not yet implemented
     Route::get('/merchants', [\App\Http\Controllers\AdminFrontendController::class, 'merchants'])->name('merchants');
-    Route::get('/transactions', [\App\Http\Controllers\AdminFrontendController::class, 'transactions'])->name('transactions');
-    Route::get('/api', [\App\Http\Controllers\AdminFrontendController::class, 'apiManagement'])->name('api');
-    Route::get('/callbacks', [\App\Http\Controllers\AdminFrontendController::class, 'callbacks'])->name('callbacks');
+    Route::get('/api', [\App\Http\Controllers\AdminProController::class, 'api'])->name('api');
+    Route::post('/api/regenerate', [\App\Http\Controllers\AdminProController::class, 'regenerateKey'])->name('api.regenerate');
+
+    // Keep others pointing to frontend controller if not yet implemented
+    Route::get('/merchants', [\App\Http\Controllers\AdminFrontendController::class, 'merchants'])->name('merchants');
     Route::get('/settlements', [\App\Http\Controllers\AdminFrontendController::class, 'settlements'])->name('settlements');
     Route::get('/risk', [\App\Http\Controllers\AdminFrontendController::class, 'risk'])->name('risk');
     Route::get('/balance', [\App\Http\Controllers\AdminFrontendController::class, 'balance'])->name('balance');

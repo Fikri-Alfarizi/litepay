@@ -9,8 +9,9 @@ use App\Http\Controllers\Api\CallbackController; // Although callback is usually
 // Gateway sends callback -> (Logic in Job)
 // Maybe TransactionStatusController is for merchant to query status?
 
-Route::middleware(['verify.api.key', 'verify.signature'])->group(function () {
-    Route::post('/payment', [PaymentController::class, 'create'])->name('api.payment.create');
+Route::middleware(['verify.api.key'])->group(function () {
+    Route::post('/transaction/create', [App\Http\Controllers\Api\TransactionController::class, 'create'])->name('api.transaction.create');
+    Route::post('/payment', [PaymentController::class, 'create']); // Legacy or alias
 });
 
 // Public or secured differently?

@@ -10,10 +10,20 @@ class PaymentService
 {
     public function createTransaction(Merchant $merchant, array $data): Transaction
     {
+        // Calculate Fees
+        $amount = $data['amount'];
+        $fee = 2500; // Flat admin fee
+        $tax = $amount * 0.11; // 11% PPN
+        $totalAmount = $amount + $fee + $tax;
+
         return Transaction::create([
             'merchant_id' => $merchant->id,
             'invoice_id' => $data['invoice_id'],
-            'amount' => $data['amount'],
+            'amount' => $amount,
+            'fee' => $fee,
+            'tax' => $tax,
+            'total_amount' => $totalAmount,
+            'product_name' => $data['product_name'] ?? 'Unknown Product',
             'payment_channel' => $data['payment_channel'] ?? 'virtual_account',
             'user_id' => $data['user_id'] ?? null,
             'destination_number' => $data['destination_number'] ?? null,
