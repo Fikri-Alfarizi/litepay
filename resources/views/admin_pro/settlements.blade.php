@@ -18,12 +18,12 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700">
             <h3 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">Pending Payouts</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">Rp 450.5M</p>
-            <p class="text-xs text-gray-400 mt-1">12 requests waiting</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">Rp {{ number_format($totalPending, 0, ',', '.') }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ $pendingSettlements->count() }} requests waiting</p>
         </div>
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700">
              <h3 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">Processed Today</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">Rp 1.2B</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-gray-100 mt-2">Rp {{ number_format($processedToday, 0, ',', '.') }}</p>
             <p class="text-xs text-green-500 mt-1">Successfully transferred</p>
         </div>
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700">
@@ -49,33 +49,37 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @for ($i = 0; $i < 5; $i++)
+                    @forelse ($pendingSettlements as $settlement)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="ml-0">
-                                        <div class="text-sm font-bold text-gray-900 dark:text-gray-100">Merchant Partner #{{ $i+1 }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">TAX ID: 829.123.{{ rand(100, 999) }}</div>
+                                        <div class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ $settlement->merchant->name }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">ID: {{ $settlement->merchant->user->email }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="block text-sm font-bold text-gray-800 dark:text-gray-100">{{ ['BCA', 'Mandiri', 'BRI', 'BNI'][$i % 4] }}</span>
-                                <span class="block text-xs text-gray-500 dark:text-gray-400 font-mono">{{ rand(1000000000, 9999999999) }}</span>
-                                <span class="block text-xs text-gray-500 dark:text-gray-400">A/N PT Merchant Sejahtera</span>
+                                <span class="block text-sm font-bold text-gray-800 dark:text-gray-100">{{ $settlement->bank_name }}</span>
+                                <span class="block text-xs text-gray-500 dark:text-gray-400 font-mono">{{ $settlement->bank_account_number }}</span>
+                                <span class="block text-xs text-gray-500 dark:text-gray-400">A/N {{ $settlement->bank_account_name }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">Rp {{ number_format(rand(10000000, 50000000), 0, ',', '.') }}</span>
+                                <span class="text-sm font-bold text-gray-900 dark:text-gray-100">Rp {{ number_format($settlement->amount, 0, ',', '.') }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ now()->subHours($i)->format('H:i') }}
+                                {{ $settlement->created_at->format('H:i') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button class="bg-green-600 text-white px-3 py-1 rounded shadow hover:bg-green-700 text-xs mr-2">Approve</button>
                                 <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs">Reject</button>
                             </td>
                         </tr>
-                    @endfor
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No pending withdrawal requests.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

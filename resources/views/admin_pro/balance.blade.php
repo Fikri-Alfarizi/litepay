@@ -23,15 +23,15 @@
             <div class="absolute right-0 top-0 h-full w-1/2 bg-white opacity-5 transform skew-x-12"></div>
             <div class="relative z-10">
                 <p class="text-indigo-200 text-xs font-semibold uppercase tracking-wider">Active Balance</p>
-                <h2 class="text-3xl font-bold mt-1">Rp 124.500.000</h2>
+                <h2 class="text-3xl font-bold mt-1">Rp {{ number_format($activeBalance, 0, ',', '.') }}</h2>
                 <div class="mt-4 flex space-x-6">
                     <div>
                         <p class="text-indigo-200 text-[10px] text-opacity-80">On Hold</p>
-                        <p class="font-bold text-sm">Rp 2.300.000</p>
+                        <p class="font-bold text-sm">Rp {{ number_format($onHold, 0, ',', '.') }}</p>
                     </div>
                      <div>
                         <p class="text-indigo-200 text-[10px] text-opacity-80">Pending Settlement</p>
-                         <p class="font-bold text-sm">Rp 15.420.000</p>
+                         <p class="font-bold text-sm">Rp {{ number_format($pendingSettlement, 0, ',', '.') }}</p>
                     </div>
                 </div>
             </div>
@@ -70,26 +70,29 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @for ($i = 0; $i < 6; $i++)
-                        @php $isCredit = rand(0, 1) == 1; @endphp
+                    @forelse ($mutations as $mutation)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <td class="px-4 py-2 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
-                                {{ now()->subDays($i)->format('d M Y H:i') }}
+                                {{ $mutation->created_at->format('d M Y H:i') }}
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap">
-                                <span class="block text-xs font-bold text-gray-800 dark:text-gray-100">{{ $isCredit ? 'Settlement from TRX' : 'Withdrawal Fee' }}</span>
+                                <span class="block text-xs font-bold text-gray-800 dark:text-gray-100">Settlement from TRX</span>
                                 <span class="text-[10px] text-gray-500 dark:text-gray-400">Merchant Payment</span>
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap text-xs font-mono text-gray-500 dark:text-gray-400">
-                                REF-{{ rand(100000, 999999) }}
+                                {{ $mutation->reference_id }}
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap text-right">
-                                <span class="text-xs font-bold {{ $isCredit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
-                                    {{ $isCredit ? '+' : '-' }} Rp {{ number_format(rand(50000, 500000), 0, ',', '.') }}
+                                <span class="text-xs font-bold text-green-600 dark:text-green-400">
+                                    + Rp {{ number_format($mutation->total_amount, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
-                    @endfor
+                    @empty
+                         <tr>
+                            <td colspan="4" class="px-4 py-4 text-center text-sm text-gray-500">No mutations found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

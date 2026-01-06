@@ -42,6 +42,19 @@ class PaymentService
             'paid_at' => $status === 'SUCCESS' ? now() : null,
         ]);
 
+        if ($status === 'SUCCESS' && $transaction->user_id) {
+             // If it's a Top Up, add to balance
+             // Or generally if it's a "credit" type transaction.
+             // For now, let's assume all transactions with user_id that are "Top Up" imply adding balance.
+             // We can check product_name or implement a type.
+             if (Str::contains($transaction->product_name, 'Top Up')) {
+                 $user = \App\Models\User::find($transaction->user_id);
+                 if ($user) {
+                     $user->increment('balance', $transaction->amount);
+                 }
+             }
+        }
+
         // Dispatch Callback
         \App\Jobs\SendCallbackJob::dispatch($transaction);
     }

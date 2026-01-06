@@ -22,12 +22,11 @@
             </div>
             <!-- Mock Chart Area -->
              <div class="h-40 flex items-end space-x-2">
-                @for($i=0; $i<30; $i++)
+                @foreach($chartData as $value)
                     <div class="w-full bg-red-100 dark:bg-red-900/30 rounded-t hover:bg-red-200 dark:hover:bg-red-900/50 relative group">
-                        @php $h = rand(10, 80); @endphp
-                        <div class="absolute bottom-0 w-full bg-red-400 dark:bg-red-600 rounded-t" style="height: {{ $h }}%"></div>
+                        <div class="absolute bottom-0 w-full bg-red-400 dark:bg-red-600 rounded-t" style="height: {{ $value }}%"></div>
                     </div>
-                @endfor
+                @endforeach
             </div>
              <div class="text-center text-xs text-gray-400 mt-2">Last 30 Minutes</div>
         </div>
@@ -37,28 +36,28 @@
                  <div>
                      <div class="flex justify-between text-xs mb-1">
                          <span class="text-green-600 dark:text-green-400 font-bold">Low</span>
-                         <span class="text-gray-600 dark:text-gray-300">85%</span>
+                         <span class="text-gray-600 dark:text-gray-300">{{ $lowPct }}%</span>
                      </div>
                      <div class="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                         <div class="bg-green-500 h-2 w-10/12"></div>
+                         <div class="bg-green-500 h-2" style="width: {{ $lowPct }}%"></div>
                      </div>
                  </div>
                  <div>
                      <div class="flex justify-between text-xs mb-1">
                          <span class="text-yellow-600 dark:text-yellow-400 font-bold">Medium</span>
-                         <span class="text-gray-600 dark:text-gray-300">12%</span>
+                         <span class="text-gray-600 dark:text-gray-300">{{ $medPct }}%</span>
                      </div>
                      <div class="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                         <div class="bg-yellow-500 h-2 w-2/12"></div>
+                         <div class="bg-yellow-500 h-2" style="width: {{ $medPct }}%"></div>
                      </div>
                  </div>
                  <div>
                      <div class="flex justify-between text-xs mb-1">
                          <span class="text-red-600 dark:text-red-400 font-bold">High</span>
-                         <span class="text-gray-600 dark:text-gray-300">3%</span>
+                         <span class="text-gray-600 dark:text-gray-300">{{ $highPct }}%</span>
                      </div>
                      <div class="w-full bg-gray-100 dark:bg-gray-700 h-2 rounded-full overflow-hidden">
-                         <div class="bg-red-500 h-2 w-1/12"></div>
+                         <div class="bg-red-500 h-2" style="width: {{ $highPct }}%"></div>
                      </div>
                  </div>
              </div>
@@ -82,32 +81,35 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @for ($i = 0; $i < 6; $i++)
-                        @php $score = rand(70, 99); @endphp
+                    @forelse ($fraudAlerts as $alert)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-lg font-bold {{ $score > 85 ? 'text-red-600 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400' }}">{{ $score }}</span>
+                                <span class="text-lg font-bold {{ $alert->risk_score > 85 ? 'text-red-600 dark:text-red-400' : 'text-yellow-600 dark:text-yellow-400' }}">{{ $alert->risk_score }}</span>
                                 <span class="text-xs text-gray-400">/100</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="block text-sm font-bold text-gray-800 dark:text-gray-100">
-                                    {{ ['Velocity Limit Exceeded', 'Suspicious IP Location', 'Card Bin Blacklisted'][$i % 3] }}
+                                    {{ $alert->reason }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="block text-sm text-gray-600 dark:text-gray-300 font-mono">TRX-{{ rand(1000, 9999) }}</span>
-                                <span class="text-xs text-gray-400">Rp {{ number_format(rand(1000000, 5000000), 0, ',', '.') }}</span>
+                                <span class="block text-sm text-gray-600 dark:text-gray-300 font-mono">{{ $alert->transaction ? $alert->transaction->reference_id : 'N/A' }}</span>
+                                <span class="text-xs text-gray-400">{{ $alert->transaction ? 'Rp '.number_format($alert->transaction->total_amount, 0, ',', '.') : '-' }}</span>
                             </td>
                              <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm font-mono text-gray-600 dark:text-gray-400">{{ rand(1, 255) }}.{{ rand(1, 255) }}.{{ rand(1, 255) }}.{{ rand(1, 255) }}</span>
-                                <span class="block text-xs text-gray-400">{{ ['US', 'RU', 'CN', 'NG'][$i % 4] }}</span>
+                                <span class="text-sm font-mono text-gray-600 dark:text-gray-400">{{ $alert->ip_address }}</span>
+                                <span class="block text-xs text-gray-400">{{ $alert->country_code }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 border border-red-200 dark:border-red-800 px-3 py-1 rounded bg-red-50 dark:bg-red-900/20">Block</button>
                                 <button class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 ml-2">Ignore</button>
                             </td>
                         </tr>
-                    @endfor
+                    @empty
+                         <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No fraud alerts detected.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

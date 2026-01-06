@@ -37,9 +37,14 @@
         </div>
 
         @auth
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
-                <p class="text-blue-100 text-xs mb-1">LitePay Balance</p>
-                <p class="text-3xl font-bold">Rp 0</p>
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex justify-between items-center">
+                <div>
+                    <p class="text-blue-100 text-xs mb-1">LitePay Balance</p>
+                    <p class="text-3xl font-bold">Rp {{ number_format(Auth::user()->balance, 0, ',', '.') }}</p>
+                </div>
+                <a href="{{ route('transaction.topup') }}" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-bold text-sm shadow hover:bg-blue-50 transition">
+                    + Top Up
+                </a>
             </div>
         @else
             <a href="{{ route('customer.login') }}"

@@ -23,8 +23,10 @@
              </div>
              
              <div class="relative">
-                 <input type="text" placeholder="Search merchant..." class="pl-8 pr-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-xs focus:ring-indigo-500 focus:border-indigo-500 w-56 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400">
-                 <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                 <form action="{{ route('admin_pro.merchants') }}" method="GET">
+                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search merchant..." class="pl-8 pr-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-xs focus:ring-indigo-500 focus:border-indigo-500 w-56 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400">
+                     <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                 </form>
              </div>
         </div>
 
@@ -41,30 +43,32 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @for ($i = 0; $i < 8; $i++)
+                    @forelse ($merchants as $merchant)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <td class="px-4 py-2.5 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="h-8 w-8 flex-shrink-0">
-                                        <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name=Merchant+{{ $i }}&background=random" alt="">
+                                        <img class="h-8 w-8 rounded-full" src="https://ui-avatars.com/api/?name={{ urlencode($merchant->name) }}&background=random" alt="">
                                     </div>
                                     <div class="ml-3">
-                                        <div class="text-xs font-bold text-gray-900 dark:text-gray-100">Merchant Partner #{{ $i+1 }}</div>
-                                        <div class="text-[10px] text-gray-500 dark:text-gray-400">merchant{{$i}}@example.com</div>
+                                        <div class="text-xs font-bold text-gray-900 dark:text-gray-100">{{ $merchant->name }}</div>
+                                        <div class="text-[10px] text-gray-500 dark:text-gray-400">{{ $merchant->user->email ?? 'N/A' }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap">
-                                <span class="px-2 py-0.5 inline-flex text-[10px] leading-4 font-bold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 border border-green-200 dark:border-green-800">
-                                    Active / Prod
+                                <span class="px-2 py-0.5 inline-flex text-[10px] leading-4 font-bold rounded-full {{ $merchant->status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 border-green-200' : 'bg-red-100 text-red-800 border-red-200' }} border dark:border-opacity-20">
+                                    {{ ucfirst($merchant->status) }}
                                 </span>
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap">
-                                <span class="text-xs text-gray-900 dark:text-gray-200 font-bold">Rp {{ rand(10, 500) }}M</span>
-                                <span class="block text-[10px] text-green-600 dark:text-green-400">▲ {{ rand(1, 10) }}% vs last month</span>
+                                <span class="text-xs text-gray-900 dark:text-gray-200 font-bold">Rp {{ number_format($merchant->volume, 0, ',', '.') }}</span>
+                                <span class="block text-[10px] {{ $merchant->growth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                    {{ $merchant->growth >= 0 ? '▲' : '▼' }} {{ number_format(abs($merchant->growth), 1) }}% vs last month
+                                </span>
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
-                                {{ now()->subHours(rand(1, 24))->diffForHumans() }}
+                                {{ $merchant->last_active ? \Carbon\Carbon::parse($merchant->last_active)->diffForHumans() : 'Never' }}
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap text-right text-xs font-medium">
                                 <div class="flex justify-end space-x-2 text-indigo-600 dark:text-indigo-400">
@@ -74,29 +78,18 @@
                                 </div>
                             </td>
                         </tr>
-                    @endfor
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500 text-center">No merchants found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         
         <!-- Pagination -->
-        <div class="bg-white dark:bg-gray-800 px-4 py-2 border-t border-gray-200 dark:border-gray-700 sm:px-4 flex items-center justify-between">
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-xs text-gray-700 dark:text-gray-300">
-                        Showing <span class="font-bold">1</span> to <span class="font-bold">10</span> of <span class="font-bold">97</span> results
-                    </p>
-                </div>
-                <div>
-                   <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600">Prev</a>
-                        <a href="#" class="relative inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">1</a>
-                        <a href="#" class="relative inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">2</a>
-                        <a href="#" class="relative inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">3</a>
-                        <a href="#" class="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600">Next</a>
-                    </nav>
-                </div>
-            </div>
+        <div class="bg-white dark:bg-gray-800 px-4 py-2 border-t border-gray-200 dark:border-gray-700 sm:px-4">
+             {{ $merchants->links() }}
         </div>
     </div>
         <!-- Modal -->
