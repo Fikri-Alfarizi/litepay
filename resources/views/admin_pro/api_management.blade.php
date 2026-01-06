@@ -14,17 +14,17 @@
 
     <!-- Usage Stats -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border-l-4 border-indigo-500">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <h3 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">Requests Today</h3>
             <p class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-2">45,231</p>
             <p class="text-xs text-green-500 mt-1">Within limits</p>
         </div>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border-l-4 border-yellow-500">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <h3 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">Average Latency</h3>
             <p class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-2">124ms</p>
             <p class="text-xs text-yellow-500 mt-1">Slightly elevated</p>
         </div>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border-l-4 border-green-500">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
             <h3 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">System Status</h3>
             <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">Operational</p>
             <p class="text-xs text-gray-400 mt-1">All systems go</p>

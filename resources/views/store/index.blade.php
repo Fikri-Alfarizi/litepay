@@ -87,15 +87,69 @@
                 <span class="text-xs font-medium text-gray-700">PLN</span>
             </a>
 
-            <a href="#" class="flex flex-col items-center gap-2 group opacity-50 cursor-not-allowed">
-                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center">
+            <!-- Mobile Legends -->
+            <a href="{{ route('store.category', 'mobile-legends') }}" class="flex flex-col items-center gap-2 group">
+                <div
+                    class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
                         </path>
                     </svg>
                 </div>
-                <span class="text-xs font-medium text-gray-700">Games</span>
+                <span class="text-xs font-medium text-gray-700">Mobile Legends</span>
+            </a>
+
+            <!-- Free Fire -->
+            <a href="{{ route('store.category', 'free-fire') }}" class="flex flex-col items-center gap-2 group">
+                <div
+                    class="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z">
+                        </path>
+                    </svg>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Free Fire</span>
+            </a>
+
+            <!-- PUBG Mobile -->
+            <a href="{{ route('store.category', 'pubg-mobile') }}" class="flex flex-col items-center gap-2 group">
+                <div
+                    class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"> <!-- Clock/Time logic for 'Survival' -->
+                        </path>
+                    </svg>
+                </div>
+                <span class="text-xs font-medium text-gray-700">PUBG Mobile</span>
+            </a>
+
+            <!-- Genshin Impact -->
+            <a href="{{ route('store.category', 'genshin-impact') }}" class="flex flex-col items-center gap-2 group">
+                <div
+                    class="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"> <!-- Star-like -->
+                        </path>
+                    </svg>
+                </div>
+                <span class="text-xs font-medium text-gray-700" style="font-size: 0.65rem; line-height: 1rem;">Genshin Impact</span>
+            </a>
+
+            <!-- Valorant -->
+            <a href="{{ route('store.category', 'valorant') }}" class="flex flex-col items-center gap-2 group">
+                <div
+                    class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"> <!-- Desktop/PC -->
+                        </path>
+                    </svg>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Valorant</span>
             </a>
         </div>
     </div>

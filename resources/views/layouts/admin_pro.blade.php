@@ -10,6 +10,9 @@
         tailwind.config = {
             darkMode: 'class',
         }
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,7 +31,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 transition-colors duration-200" :class="{ 'dark': darkMode, 'bg-gray-900 text-gray-100': darkMode }" x-data="{ 
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200" :class="{ 'dark': darkMode }" x-data="{ 
     darkMode: localStorage.getItem('darkMode') === 'true',
     toggleTheme() {
         this.darkMode = !this.darkMode;
@@ -39,9 +42,9 @@
             document.documentElement.classList.remove('dark');
         }
     }
-}" x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark')); if(darkMode) document.documentElement.classList.add('dark');">
+}" x-init="$watch('darkMode', val => val ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark'));">
 
-    <div class="flex h-screen overflow-hidden" :class="{ 'dark:bg-gray-900': darkMode }">
+    <div class="flex h-screen overflow-hidden dark:bg-gray-900">
         <!-- Sidebar -->
         <aside class="w-64 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 flex flex-col shadow-xl border-r border-gray-200 dark:border-gray-700 transition-colors duration-200">
             <div class="h-16 flex items-center justify-center border-b border-gray-200 dark:border-gray-700">
@@ -138,7 +141,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col overflow-y-auto bg-gray-50 transition-colors duration-200" :class="{ 'dark:bg-gray-900': darkMode }">
+        <main class="flex-1 flex flex-col overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
             <!-- Top Navbar -->
             <header class="pt-8 pb-4 flex items-center justify-between px-8 transition-colors duration-200">
                 <div class="flex items-center">
