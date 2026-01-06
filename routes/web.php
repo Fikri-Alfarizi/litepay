@@ -64,12 +64,19 @@ Route::prefix('merchant')->name('merchant.')->group(function () {
     });
 });
 
+// Consumer Routes (Top Up)
+Route::middleware('auth')->group(function () {
+    Route::get('/topup', [\App\Http\Controllers\ConsumerTransactionController::class, 'topUp'])->name('transaction.topup');
+    Route::post('/topup', [\App\Http\Controllers\ConsumerTransactionController::class, 'processTopUp'])->name('transaction.processTopUp');
+});
+
 // Public Routes (Checkout & Callback)
 // Public Routes (Checkout)
 Route::get('checkout/{reference}', [App\Http\Controllers\CheckoutController::class, 'show'])->name('checkout.show');
 Route::get('checkout/{reference}/success', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('checkout/{reference}/status', [App\Http\Controllers\CheckoutController::class, 'checkStatus'])->name('checkout.status');
 Route::post('checkout/{reference}/simulate', [App\Http\Controllers\CheckoutController::class, 'simulatePay'])->name('checkout.simulate');
+Route::post('checkout/{reference}/pay-balance', [App\Http\Controllers\CheckoutController::class, 'payWithBalance'])->name('checkout.pay_balance')->middleware('auth');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
@@ -86,18 +93,17 @@ Route::prefix('admin-pro')->name('admin_pro.')->group(function () {
     Route::get('/settings', [\App\Http\Controllers\AdminProController::class, 'settings'])->name('settings');
 
     // Keep others pointing to frontend controller if not yet implemented
-    Route::get('/merchants', [\App\Http\Controllers\AdminFrontendController::class, 'merchants'])->name('merchants');
+    Route::get('/merchants', [\App\Http\Controllers\AdminProController::class, 'merchants'])->name('merchants');
     Route::get('/api', [\App\Http\Controllers\AdminProController::class, 'api'])->name('api');
     Route::post('/api/regenerate', [\App\Http\Controllers\AdminProController::class, 'regenerateKey'])->name('api.regenerate');
 
     // Keep others pointing to frontend controller if not yet implemented
-    Route::get('/merchants', [\App\Http\Controllers\AdminFrontendController::class, 'merchants'])->name('merchants');
-    Route::get('/settlements', [\App\Http\Controllers\AdminFrontendController::class, 'settlements'])->name('settlements');
-    Route::get('/risk', [\App\Http\Controllers\AdminFrontendController::class, 'risk'])->name('risk');
-    Route::get('/balance', [\App\Http\Controllers\AdminFrontendController::class, 'balance'])->name('balance');
+    Route::get('/settlements', [\App\Http\Controllers\AdminProController::class, 'settlements'])->name('settlements');
+    Route::get('/risk', [\App\Http\Controllers\AdminProController::class, 'risk'])->name('risk');
+    Route::get('/balance', [\App\Http\Controllers\AdminProController::class, 'balance'])->name('balance');
     Route::get('/balance/top-up', [\App\Http\Controllers\AdminFrontendController::class, 'topUp'])->name('balance.top_up');
     Route::get('/balance/withdraw', [\App\Http\Controllers\AdminFrontendController::class, 'withdraw'])->name('balance.withdraw');
-    Route::get('/promo', [\App\Http\Controllers\AdminFrontendController::class, 'promo'])->name('promo');
+    Route::get('/promo', [\App\Http\Controllers\AdminProController::class, 'promo'])->name('promo');
 
     // Account Group
     Route::prefix('account')->name('account.')->group(function () {

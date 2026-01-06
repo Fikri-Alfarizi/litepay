@@ -43,12 +43,21 @@ class PaymentService
         ]);
 
         if ($status === 'SUCCESS') {
+            // Inbox Notification (Local Feature)
             \App\Models\Inbox::create([
                 'user_id' => $transaction->user_id,
                 'title' => 'Pembayaran Berhasil!',
                 'message' => "Pembayaran untuk {$transaction->product_name} senilai Rp " . number_format($transaction->total_amount, 0, ',', '.') . " telah berhasil.",
                 'type' => 'success'
             ]);
+
+            // Balance Increment (Upstream Feature)
+            if ($transaction->user_id && Str::contains($transaction->product_name, 'Top Up')) {
+                $user = \App\Models\User::find($transaction->user_id);
+                if ($user) {
+                    $user->increment('balance', $transaction->amount);
+                }
+            }
         }
 
         // Dispatch Callback

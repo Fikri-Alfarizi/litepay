@@ -53,4 +53,34 @@ class CheckoutController extends Controller
 
         return response()->json(['message' => 'Payment Successful']);
     }
+
+    public function payWithBalance(Request $request, $reference, PaymentService $paymentService)
+    {
+        $transaction = Transaction::where('reference_id', $reference)->firstOrFail();
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        if ($transaction->status !== 'PENDING') {
+            return response()->json(['message' => 'Transaction already processed'], 400);
+        }
+
+        if ($user->balance < $transaction->total_amount) {
+            return response()->json(['message' => 'Insufficient balance'], 400);
+        }
+
+        // Atomic transaction
+        \DB::transaction(function () use ($user, $transaction, $paymentService) {
+            $user->decrement('balance', $transaction->total_amount);
+            
+            // Update transaction channel to reflect wallet usage
+            $transaction->update(['payment_channel' => 'litepay_balance']);
+
+            $paymentService->updateStatus($transaction, 'SUCCESS');
+        });
+
+        return response()->json(['message' => 'Payment Successful']);
+    }
 }
