@@ -74,7 +74,6 @@ class StoreController extends Controller
             'product_name' => $request->product_name,
             'payment_channel' => 'auto_detect',
             'user_id' => \Auth::check() ? \Auth::id() : null, // Attach user ID if logged in
-            'destination_number' => $request->identifier, // Save target phone number
         ]);
 
         return redirect()->route('checkout.show', $transaction->reference_id);

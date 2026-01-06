@@ -12,16 +12,28 @@
         <h1 class="font-bold text-lg text-gray-800">Buy {{ $categoryName }}</h1>
     </div>
 
+    @php
+        $gameSlugs = ['mobile-legends', 'free-fire', 'pubg-mobile', 'genshin-impact', 'valorant'];
+        $isGame = in_array($slug, $gameSlugs);
+    @endphp
+
     <div class="p-4">
 
         <!-- Input Section -->
         <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
             <label class="block text-xs font-bold text-gray-400 uppercase mb-1">
-                {{ $slug === 'pln' ? 'Customer ID / Meter No' : 'Phone Number' }}
+                @if($slug === 'pln')
+                    Customer ID / Meter No
+                @elseif($isGame)
+                    Game ID
+                @else
+                    Phone Number
+                @endif
             </label>
             <div class="flex items-center gap-2">
                 <input type="tel" id="identifierInput"
-                    class="w-full text-xl font-semibold outline-none py-2 placeholder-gray-300" placeholder="08..."
+                    class="w-full text-xl font-semibold outline-none py-2 placeholder-gray-300" 
+                    placeholder="{{ $isGame ? 'Enter ID' : ($slug === 'pln' ? 'Enter Customer ID' : '08...') }}"
                     autofocus>
                 @if($slug !== 'pln')
                     <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -31,10 +31,10 @@ class GeminiService
         // Get Real-time Database Context
         $dbContext = $this->getDatabaseContext();
         $systemPrompt = $this->getSystemPrompt($context) . "\n\n[DATA SISTEM REAL-TIME]\n" . $dbContext;
-        
+
         // Format history for Gemini API
         $formattedHistory = [];
-        
+
         foreach ($history as $msg) {
             $role = $msg['role'] === 'user' ? 'user' : 'model';
             $formattedHistory[] = [
@@ -53,17 +53,17 @@ class GeminiService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
             ])->post("{$this->baseUrl}{$this->model}:generateContent?key={$this->apiKey}", [
-                'contents' => $formattedHistory,
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 1000,
-                ]
-            ]);
+                        'contents' => $formattedHistory,
+                        'generationConfig' => [
+                            'temperature' => 0.7,
+                            'maxOutputTokens' => 1000,
+                        ]
+                    ]);
 
             if ($response->successful()) {
                 $data = $response->json();
                 $generatedText = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, saya tidak dapat menghasilkan respons.';
-                
+
                 return [
                     'success' => true,
                     'message' => $generatedText
@@ -93,10 +93,10 @@ class GeminiService
             $trxSuccess = Transaction::where('status', 'PAID')->count();
             $trxPending = Transaction::where('status', 'PENDING')->count();
             $trxFailed = Transaction::whereIn('status', ['FAILED', 'EXPIRED'])->count();
-            
+
             $revenueTotal = Transaction::where('status', 'PAID')->sum('amount');
             $revenueToday = Transaction::where('status', 'PAID')->whereDate('paid_at', $today)->sum('amount');
-            
+
             // Merchants
             $merchantsTotal = Merchant::count();
             $merchantsActive = Merchant::where('status', 'active')->count();
@@ -106,16 +106,20 @@ class GeminiService
                 ->latest()
                 ->take(3)
                 ->get()
-                ->map(function($log) {
+                ->map(function ($log) {
                     return "Trx ID {$log->transaction_id}: HTTP {$log->response_status}";
                 })->implode(', ');
+
+            $revenueTotalFormatted = number_format($revenueTotal, 0, ',', '.');
+            $revenueTodayFormatted = number_format($revenueToday, 0, ',', '.');
+            $recentErrorsText = $recentErrors ?: 'Tidak ada isu kritikal';
 
             return <<<EOT
 - Total Transaksi: $trxTotal ($trxToday hari ini)
 - Status Transaksi: $trxSuccess Sukses, $trxPending Pending, $trxFailed Gagal
-- Total Pendapatan: Rp " . number_format($revenueTotal, 0, ',', '.') . " (" . number_format($revenueToday, 0, ',', '.') . " hari ini)
+- Total Pendapatan: Rp {$revenueTotalFormatted} ({$revenueTodayFormatted} hari ini)
 - Total Merchant: $merchantsTotal ($merchantsActive aktif)
-- Isu Sistem Terkini: " . ($recentErrors ?: 'Tidak ada isu kritikal') . "
+- Isu Sistem Terkini: {$recentErrorsText}
 EOT;
         } catch (\Exception $e) {
             return "Gagal mengambil data sistem: " . $e->getMessage();

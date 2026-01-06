@@ -42,6 +42,15 @@ class PaymentService
             'paid_at' => $status === 'SUCCESS' ? now() : null,
         ]);
 
+        if ($status === 'SUCCESS') {
+            \App\Models\Inbox::create([
+                'user_id' => $transaction->user_id,
+                'title' => 'Pembayaran Berhasil!',
+                'message' => "Pembayaran untuk {$transaction->product_name} senilai Rp " . number_format($transaction->total_amount, 0, ',', '.') . " telah berhasil.",
+                'type' => 'success'
+            ]);
+        }
+
         // Dispatch Callback
         \App\Jobs\SendCallbackJob::dispatch($transaction);
     }

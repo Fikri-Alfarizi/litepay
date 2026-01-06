@@ -20,6 +20,40 @@
         
         @yield('content')
 
+        <!-- QR Scanner Overlay -->
+        <div id="scanner-overlay" 
+             class="fixed inset-0 z-[100] bg-black translate-y-full transition-transform duration-500 ease-in-out flex flex-col items-center justify-center max-w-md mx-auto">
+            <!-- Close Button -->
+            <button onclick="toggleScanner(false)" 
+               class="absolute top-6 left-6 z-[110] bg-white/20 backdrop-blur-md p-3 rounded-full text-white hover:bg-white/30 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+            </button>
+
+            <!-- Scanner UI -->
+            <div class="relative w-full px-6 text-center">
+                <div class="mb-8">
+                    <h2 class="text-white text-xl font-bold mb-2">Scan QR Code</h2>
+                    <p class="text-gray-400 text-sm">Posisikan kode QR di dalam kotak</p>
+                </div>
+
+                <!-- Focus Area -->
+                <div class="relative aspect-square w-full border-2 border-white/20 rounded-3xl overflow-hidden mb-8">
+                    <video id="scanner-video" class="w-full h-full object-cover"></video>
+                    
+                    <!-- Scanner Overlay Rings -->
+                    <div class="absolute inset-0 border-[40px] border-black/40"></div>
+                    <div class="absolute inset-[40px] border-2 border-blue-500 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+                        <!-- Scanner Laser Line -->
+                        <div class="absolute w-full h-0.5 bg-blue-500 top-0 animate-[scan_2s_ease-in-out_infinite]"></div>
+                    </div>
+                </div>
+
+                <p class="text-gray-500 text-xs italic">Membutuhkan izin kamera untuk melanjutkan</p>
+            </div>
+        </div>
+
         <!-- Bottom Navigation -->
         @if(!isset($hideBottomNav) || !$hideBottomNav)
         <div
@@ -46,21 +80,23 @@
             </a>
 
             <!-- Scan (Center) -->
-            <a href="#" class="relative -top-5 flex flex-col items-center justify-center group">
+            <button onclick="toggleScanner(true)" class="relative -top-5 flex flex-col items-center justify-center group outline-none">
                 <div class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-300 flex items-center justify-center transform group-hover:scale-110 transition border-4 border-white">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 17h.01M8 11h.01M12 12h.01M16 11h.01M3 20h6M3 7h6M16 20h6M16 7h6"></path>
                     </svg>
                 </div>
                 <span class="text-blue-600 font-bold mt-1">Scan</span>
-            </a>
+            </button>
 
             <!-- Inbox -->
-            <a href="#" class="flex flex-col items-center justify-center w-14 group hover:text-blue-500">
-                 <div class="mb-1 p-1 rounded-xl group-hover:bg-gray-50">
+            <a href="{{ route('customer.inbox') }}" class="flex flex-col items-center justify-center w-14 group {{ request()->routeIs('customer.inbox') ? 'text-blue-600' : 'hover:text-blue-500' }}">
+                 <div class="mb-1 p-1 rounded-xl {{ request()->routeIs('customer.inbox') ? 'bg-blue-50' : 'group-hover:bg-gray-50' }} relative">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
+                    <!-- Notification Badge -->
+                    <span id="inbox-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
                 </div>
                 <span class="font-medium">Inbox</span>
             </a>
@@ -78,6 +114,69 @@
         </div>
         @endif
     </div>
+
+    <style>
+        @keyframes scan {
+            0%, 100% { top: 0%; opacity: 0; }
+            50% { top: 100%; opacity: 1; }
+        }
+    </style>
+
+    <script>
+        let scannerStream = null;
+
+        function toggleScanner(show) {
+            const overlay = document.getElementById('scanner-overlay');
+            const video = document.getElementById('scanner-video');
+
+            if (show) {
+                overlay.classList.remove('translate-y-full');
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                        .then(function(stream) {
+                            scannerStream = stream;
+                            video.srcObject = stream;
+                            video.play();
+                        })
+                        .catch(function(err) {
+                            console.error("Error accessing camera: ", err);
+                            alert("Gagal mengakses kamera. Pastikan izin kamera sudah diberikan.");
+                            toggleScanner(false);
+                        });
+                } else {
+                    alert("Browser Anda tidak mendukung akses kamera.");
+                    toggleScanner(false);
+                }
+            } else {
+                overlay.classList.add('translate-y-full');
+                if (scannerStream) {
+                    scannerStream.getTracks().forEach(track => track.stop());
+                    scannerStream = null;
+                }
+            }
+        }
+
+        function checkUnreadInbox() {
+            fetch("{{ route('customer.inbox.unread') }}")
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('inbox-badge');
+                    if (data.unread_count > 0) {
+                        badge.innerText = data.unread_count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                })
+                .catch(err => console.error('Error fetching unread count:', err));
+        }
+
+        // Check every 5 seconds
+        if ({{ Auth::check() ? 'true' : 'false' }}) {
+            checkUnreadInbox();
+            setInterval(checkUnreadInbox, 5000);
+        }
+    </script>
     @stack('scripts')
 </body>
 

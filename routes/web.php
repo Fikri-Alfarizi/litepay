@@ -24,6 +24,8 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('history', [App\Http\Controllers\Customer\HistoryController::class, 'index'])->name('history');
         Route::get('profile', [App\Http\Controllers\Customer\ProfileController::class, 'index'])->name('profile');
+        Route::get('inbox', [App\Http\Controllers\Customer\InboxController::class, 'index'])->name('inbox');
+        Route::get('inbox/unread-count', [App\Http\Controllers\Customer\InboxController::class, 'getUnreadCount'])->name('inbox.unread');
     });
 });
 
