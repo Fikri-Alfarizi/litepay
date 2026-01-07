@@ -23,7 +23,7 @@
     <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 w-full max-w-sm border border-white/20 mb-8">
         <div class="flex justify-between mb-2">
             <span class="text-green-100">Amount Paid</span>
-            <span class="font-bold">Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>
+            <span class="font-bold">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</span>
         </div>
         <div class="flex justify-between">
             <span class="text-green-100">Reference</span>

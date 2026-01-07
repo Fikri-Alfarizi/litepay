@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CallbackLog extends Model
+class TransactionLog extends Model
 {
-    protected $fillable = ['transaction_id', 'payload', 'response_status', 'response_body', 'attempts'];
+    protected $connection = 'gateway';
+
+    public $timestamps = false;
+
+    protected $fillable = ['transaction_id', 'action', 'payload'];
 
     public function transaction()
     {

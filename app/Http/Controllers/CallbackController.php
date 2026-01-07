@@ -15,44 +15,30 @@ class CallbackController extends Controller
         // Log incoming request
         Log::info('Callback received', $request->all());
 
-        // Validate signature (Optional but recommended, skipped for simplicity as per requirement)
-        // $signature = $request->header('X-Signature');
-
-        $reference = $request->input('reference_id');
+        $invoiceId = $request->input('invoice_id');
         $status = $request->input('status');
 
-        $transaction = Transaction::where('reference_id', $reference)->first();
-
-        if (!$transaction) {
-            return response()->json(['message' => 'Transaction not found'], 404);
-        }
-
-        // Update transaction status
-        $transaction->update([
+        // 1. Merchant DB: Record Callback
+        \App\Models\PaymentCallback::create([
+            'invoice_id' => $invoiceId,
             'status' => $status,
-            'paid_at' => $status === 'paid' ? now() : null,
-        ]);
-
-        // Log callback
-        $transaction->website_callback_logs()->create([
             'payload' => json_encode($request->all()),
-            'status' => 'processed', // or 'success'
-            'response' => '200 OK',
+            'received_at' => now(),
         ]);
 
-        // Send callback to merchant via background job (Queue) or direct HTTP
-        if ($transaction->merchant->callback_url) {
-            try {
-                Http::timeout(5)->post($transaction->merchant->callback_url, [
-                    'reference_id' => $transaction->reference_id,
-                    'status' => $transaction->status,
-                    'amount' => $transaction->amount,
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to send callback to merchant: ' . $e->getMessage());
+        // 2. Merchant DB: Update OrderPayment & Order
+        $orderPayment = \App\Models\OrderPayment::where('invoice_id', $invoiceId)->first();
+        if ($orderPayment) {
+            $orderPayment->update([
+                'payment_status' => $status,
+                'paid_at' => $status === 'paid' ? now() : null,
+            ]);
+
+            if ($status === 'paid') {
+                $orderPayment->order->update(['status' => 'PAID']);
             }
         }
 
-        return response()->json(['message' => 'Callback processed']);
+        return response()->json(['message' => 'Callback received and processed by Merchant']);
     }
 }

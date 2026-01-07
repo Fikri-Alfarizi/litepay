@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::connection('gateway')->create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('merchant_id')->constrained()->onDelete('cascade');
+            $table->foreignId('merchant_id')->constrained('merchants')->onDelete('cascade');
             $table->string('invoice_id')->unique();
             $table->decimal('amount', 15, 2);
-            $table->string('payment_channel')->default('virtual_account'); // e.g., VA, QRIS
             $table->string('status')->default('PENDING'); // PENDING, SUCCESS, FAILED, EXPIRED
+            $table->string('payment_method')->default('QRIS');
             $table->timestamp('paid_at')->nullable();
-            $table->string('reference_id')->nullable(); 
+            $table->string('reference_id')->unique(); 
             $table->timestamps();
         });
     }

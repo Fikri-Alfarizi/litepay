@@ -77,6 +77,7 @@ Route::get('checkout/{reference}/success', [App\Http\Controllers\CheckoutControl
 Route::get('checkout/{reference}/status', [App\Http\Controllers\CheckoutController::class, 'checkStatus'])->name('checkout.status');
 Route::post('checkout/{reference}/simulate', [App\Http\Controllers\CheckoutController::class, 'simulatePay'])->name('checkout.simulate');
 Route::post('checkout/{reference}/pay-balance', [App\Http\Controllers\CheckoutController::class, 'payWithBalance'])->name('checkout.pay_balance')->middleware('auth');
+Route::get('checkout/{reference}/cancel', [App\Http\Controllers\CheckoutController::class, 'cancel'])->name('checkout.cancel');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
@@ -117,3 +118,6 @@ Route::prefix('admin-pro')->name('admin_pro.')->group(function () {
     Route::post('/chatbot/send', [\App\Http\Controllers\AdminPro\ChatbotController::class, 'sendMessage'])->name('chatbot.send');
 });
 
+// Gateway Simulator (Real-world mimic)
+Route::get('/gateway/simulate-scan/{reference}', [App\Http\Controllers\Gateway\SimulatorController::class, 'show'])->name('gateway.simulator.show');
+Route::post('/gateway/simulate-scan/{reference}', [App\Http\Controllers\Gateway\SimulatorController::class, 'pay'])->name('gateway.simulator.pay');

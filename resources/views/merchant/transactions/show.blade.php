@@ -15,6 +15,14 @@
             <div class="px-6 py-5">
                 <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                     <div class="col-span-1">
+                        <dt class="text-sm font-medium text-gray-500">Invoice ID</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $transaction->invoice_id }}</dd>
+                    </div>
+                    <div class="col-span-1">
+                        <dt class="text-sm font-medium text-gray-500">Product</dt>
+                        <dd class="mt-1 text-sm font-bold text-blue-600">{{ $orderPayment->order->product_name ?? 'Digital Product' }}</dd>
+                    </div>
+                    <div class="col-span-1">
                         <dt class="text-sm font-medium text-gray-500">Reference ID</dt>
                         <dd class="mt-1 text-sm text-gray-900">{{ $transaction->reference_id }}</dd>
                     </div>
@@ -24,9 +32,9 @@
                             {{ number_format($transaction->amount, 0, ',', '.') }}</dd>
                     </div>
                     <div class="col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Payment Channel</dt>
+                        <dt class="text-sm font-medium text-gray-500">Payment Method</dt>
                         <dd class="mt-1 text-sm text-gray-900">
-                            {{ $transaction->payment_channel ? ucfirst(str_replace('_', ' ', $transaction->payment_channel)) : 'N/A' }}
+                            {{ $transaction->payment_method ?? 'QRIS' }}
                         </dd>
                     </div>
                     <div class="col-span-1">
@@ -38,16 +46,18 @@
                 </dl>
             </div>
 
-            @if($transaction->website_callback_logs->count() > 0)
+            @if($transaction->callbackAttempts->count() > 0)
                 <div class="px-6 py-5 border-t border-gray-200">
-                    <h4 class="text-md font-medium text-gray-900 mb-4">Callback Logs</h4>
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Callback History</h4>
                     <div class="bg-gray-50 rounded-lg p-4 font-mono text-xs overflow-x-auto">
                         <ul class="space-y-4">
-                            @foreach($transaction->website_callback_logs as $log)
+                            @foreach($transaction->callbackAttempts as $attempt)
                                 <li class="border-b pb-2 last:border-b-0 last:pb-0">
-                                    <p class="text-gray-500 mb-1">{{ $log->created_at->format('Y-m-d H:i:s') }}</p>
-                                    <p class="text-green-600 font-bold">STATUS: {{ $log->status }}</p>
-                                    <div class="mt-1 text-gray-700 whitespace-pre-wrap">{{ $log->payload }}</div>
+                                    <p class="text-gray-500 mb-1">{{ $attempt->created_at->format('Y-m-d H:i:s') }}</p>
+                                    <p class="text-blue-600 font-bold uppercase">URL: {{ $attempt->callback_url }}</p>
+                                    <p class="font-bold {{ $attempt->status === 'SUCCESS' ? 'text-green-600' : 'text-red-600' }}">
+                                        RESPONSE: {{ $attempt->response_code }} ({{ $attempt->status }})
+                                    </p>
                                 </li>
                             @endforeach
                         </ul>

@@ -23,14 +23,14 @@
                         <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Transaction Ref</th>
                         <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">URL</th>
-                        <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Attempts</th>
+                        <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                         <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Time</th>
                         <th class="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">Payload</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse ($callbacks as $callback)
-                        @php $status = $callback->response_status; @endphp
+                        @php $status = $callback->response_code; @endphp
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <td class="px-3 py-2 whitespace-nowrap">
                                 <span class="px-1.5 py-0.5 inline-flex text-[10px] leading-4 font-semibold rounded-md {{ $status >= 200 && $status < 300 ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' }}">
@@ -41,12 +41,12 @@
                                 <span class="font-mono text-[10px] text-gray-600 dark:text-gray-400">{{ $callback->transaction->reference_id }}</span>
                             </td>
                             <td class="px-3 py-2 whitespace-nowrap text-[10px] text-gray-500 dark:text-gray-400">
-                                <div class="max-w-[150px] truncate" title="{{ $callback->transaction->merchant->callback_url ?? 'N/A' }}">
-                                    {{ $callback->transaction->merchant->callback_url ?? 'N/A' }}
+                                <div class="max-w-[150px] truncate" title="{{ $callback->callback_url ?? 'N/A' }}">
+                                    {{ $callback->callback_url ?? 'N/A' }}
                                 </div>
                             </td>
                             <td class="px-3 py-2 whitespace-nowrap text-[10px] text-gray-500 dark:text-gray-400">
-                                {{ $callback->attempts }}
+                                {{ $callback->status }}
                             </td>
                             <td class="px-3 py-2 whitespace-nowrap text-[10px] text-gray-500 dark:text-gray-400">
                                 {{ $callback->created_at->diffForHumans() }}

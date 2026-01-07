@@ -83,4 +83,14 @@ class CheckoutController extends Controller
 
         return response()->json(['message' => 'Payment Successful']);
     }
+    public function cancel($reference, PaymentService $paymentService)
+    {
+        $transaction = Transaction::where('reference_id', $reference)->firstOrFail();
+
+        if ($transaction->status === 'PENDING') {
+            $paymentService->updateStatus($transaction, 'FAILED');
+        }
+
+        return redirect()->route('store.index')->with('info', 'Transaction cancelled.');
+    }
 }

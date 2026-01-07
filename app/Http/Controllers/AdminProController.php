@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
-use App\Models\CallbackLog; // Assuming this model exists or we'll create it/ignore for now
+use App\Models\CallbackAttempt;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -17,7 +17,7 @@ class AdminProController extends Controller
         $stats = [
             'transactions_today' => Transaction::whereDate('created_at', $today)->count(),
             'transaction_value_today' => Transaction::whereDate('created_at', $today)->where('status', 'SUCCESS')->sum('amount'),
-            'active_balance' => Transaction::where('status', 'SUCCESS')->sum('total_amount'), // Total funds held
+            'active_balance' => Transaction::where('status', 'SUCCESS')->sum('amount'), // Total funds held
             'success_rate' => 0,
             'pending_count' => Transaction::where('status', 'PENDING')->count(),
         ];
@@ -28,7 +28,7 @@ class AdminProController extends Controller
         $stats['success_rate'] = $totalTx > 0 ? round(($successTx / $totalTx) * 100, 1) : 0;
 
         // Recent Transactions
-        $recentTransactions = Transaction::with(['merchant', 'customer'])->latest()->take(5)->get();
+        $recentTransactions = Transaction::with(['merchant'])->latest()->take(5)->get();
 
         // Chart Data (Last 7 Days Revenue)
         $chartData = [
@@ -49,7 +49,7 @@ class AdminProController extends Controller
 
     public function transactions(Request $request)
     {
-        $query = Transaction::with(['merchant', 'customer']);
+        $query = Transaction::with(['merchant']);
 
         // Search
         if ($request->has('search') && $request->search != '') {
@@ -77,7 +77,7 @@ class AdminProController extends Controller
                  'Qris' => 'qris' // assuming db value is 'qris' or 'QRIS'
              ];
              $dbChannel = $channelMap[$request->channel] ?? $request->channel;
-             $query->where('payment_channel', $dbChannel);
+             $query->where('payment_method', strtoupper($dbChannel));
         }
 
         $transactions = $query->latest()->paginate(10);
@@ -94,7 +94,7 @@ class AdminProController extends Controller
 
     public function callbacks()
     {
-        $callbacks = CallbackLog::with(['transaction.merchant'])->latest()->paginate(15);
+        $callbacks = CallbackAttempt::with(['transaction.merchant'])->latest()->paginate(15);
         return view('admin_pro.callbacks', compact('callbacks'));
     }
 
@@ -183,10 +183,10 @@ class AdminProController extends Controller
     public function balance()
     {
         // Calculate Active Balance (Total Success)
-        $activeBalance = Transaction::where('status', 'SUCCESS')->sum('total_amount');
+        $activeBalance = Transaction::where('status', 'SUCCESS')->sum('amount');
 
         // Calculate Pending Settlement (Total Pending)
-        $pendingSettlement = Transaction::where('status', 'PENDING')->sum('total_amount');
+        $pendingSettlement = Transaction::where('status', 'PENDING')->sum('amount');
 
         // On Hold (Dummy for now, could be disputes etc.)
         $onHold = 0;

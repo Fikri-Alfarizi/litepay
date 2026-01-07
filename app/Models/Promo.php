@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Promo extends Model
 {
+    protected $connection = 'merchant';
+
     protected $fillable = [
         'code',
         'description',

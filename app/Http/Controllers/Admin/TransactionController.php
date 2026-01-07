@@ -16,7 +16,7 @@ class TransactionController extends Controller
 
     public function show(Transaction $transaction)
     {
-        $transaction->load('merchant.user', 'website_callback_logs');
+        $transaction->load(['merchant.user', 'callbackAttempts', 'logs']);
         return view('admin.transactions.show', compact('transaction'));
     }
 

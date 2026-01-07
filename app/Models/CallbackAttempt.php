@@ -4,18 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FraudAlert extends Model
+class CallbackAttempt extends Model
 {
     protected $connection = 'gateway';
 
-    protected $fillable = [
-        'transaction_id',
-        'risk_score',
-        'reason',
-        'ip_address',
-        'country_code',
-        'status',
-    ];
+    protected $fillable = ['transaction_id', 'callback_url', 'response_code', 'status'];
 
     public function transaction()
     {

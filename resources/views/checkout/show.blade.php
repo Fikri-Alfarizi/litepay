@@ -22,7 +22,7 @@
         <!-- Amount -->
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 text-center">
             <p class="text-gray-500 text-sm mb-1">Total Payment</p>
-            <h2 class="text-3xl font-bold text-gray-800">Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</h2>
+            <h2 class="text-3xl font-bold text-gray-800">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</h2>
             <div class="mt-4 flex justify-between text-sm text-gray-500 border-t pt-4">
                 <span>Order ID</span>
                 <span class="font-mono text-gray-700">{{ $transaction->invoice_id }}</span>
@@ -43,7 +43,7 @@
                     <div class="flex-1">
                         <p class="font-bold text-gray-800">LitePay Balance</p>
                         @auth
-                            <p class="text-sm {{ Auth::user()->balance >= $transaction->total_amount ? 'text-green-600' : 'text-red-500' }}">
+                            <p class="text-sm {{ Auth::user()->balance >= $transaction->amount ? 'text-green-600' : 'text-red-500' }}">
                                 Balance: Rp {{ number_format(Auth::user()->balance, 0, ',', '.') }}
                             </p>
                         @else
@@ -76,9 +76,18 @@
                 
                 <!-- QR details (hidden by default) -->
                 <div id="qris-details" class="hidden mt-4 pt-4 border-t">
-                    <div class="flex flex-col items-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $transaction->reference_id }}" alt="QR Code" class="w-48 h-48 mix-blend-multiply mb-2">
-                        <p class="text-xs text-center text-gray-400">Reference: {{ $transaction->reference_id }}</p>
+                        <a href="{{ route('gateway.simulator.show', $transaction->reference_id) }}" target="_blank" class="flex flex-col items-center group">
+                            <div class="bg-white p-2 rounded-xl mb-2 border-2 border-dashed border-blue-200 group-hover:border-blue-400 transition">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode(route('gateway.simulator.show', $transaction->reference_id)) }}" alt="QR Code" class="w-48 h-48 mix-blend-multiply">
+                            </div>
+                            <span class="text-[11px] text-blue-600 font-bold group-hover:underline mb-1">Click to Open Simulator</span>
+                        </a>
+                        <div class="mt-3 p-2 bg-yellow-50 rounded-lg text-left">
+                            <p class="text-[10px] text-yellow-700 italic leading-tight">
+                                <strong>💡 Phone Scan Tip:</strong> Access this site through your PC's <strong>Local IP</strong> (e.g. 192.168.x.x) so your phone can reach the simulator when scanned.
+                            </p>
+                        </div>
+                        <p class="text-[10px] text-center text-gray-400 mt-2">Ref: {{ $transaction->reference_id }}</p>
                     </div>
                 </div>
             </label>
@@ -136,7 +145,7 @@
                 </div>
                 <div class="flex justify-between font-bold text-gray-800 pt-2 border-t mt-2">
                     <span>Total</span>
-                    <span>Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>
+                    <span>Rp {{ number_format($transaction->amount, 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
@@ -145,7 +154,7 @@
             Pay Now
         </button>
         
-        <a href="{{ route('store.index') }}" class="block text-center text-gray-500 font-medium text-sm">Cancel Transaction</a>
+        <a href="{{ route('checkout.cancel', $transaction->reference_id) }}" class="block text-center text-gray-500 font-medium text-sm">Cancel Transaction</a>
     </div>
 </div>
 
@@ -168,7 +177,7 @@
             document.getElementById('va-details').classList.remove('hidden');
             btn.innerText = 'Run Simulation (VA)';
         } else {
-            btn.innerText = 'Pay Now (Rp {{ number_format($transaction->total_amount, 0, ',', '.') }})';
+            btn.innerText = 'Pay Now (Rp {{ number_format($transaction->amount, 0, ',', '.') }})';
         }
     }
 
@@ -179,9 +188,11 @@
 
         let url = "{{ route('checkout.pay_balance', $transaction->reference_id) }}";
         
-        // If external method, use simulation endpoint for now
+        // If external method, use simulator
         if (selectedMethod !== 'balance') {
-            url = "{{ route('checkout.simulate', $transaction->reference_id) }}";
+            window.open("{{ route('gateway.simulator.show', $transaction->reference_id) }}", "_blank");
+            btn.innerText = 'Waiting for Payment...';
+            return;
         }
         
         fetch(url, {

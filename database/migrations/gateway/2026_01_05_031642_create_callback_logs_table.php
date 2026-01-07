@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('callback_logs', function (Blueprint $table) {
+        Schema::connection('gateway')->create('callback_attempts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
-            $table->text('payload');
-            $table->integer('response_status')->nullable();
-            $table->text('response_body')->nullable();
-            $table->integer('attempts')->default(0);
-            $table->timestamps();
+            $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->string('callback_url');
+            $table->integer('response_code')->nullable();
+            $table->string('status'); // SUCCESS / FAILED
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

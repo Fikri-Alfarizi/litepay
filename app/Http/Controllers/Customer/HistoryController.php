@@ -11,8 +11,7 @@ class HistoryController extends Controller
 {
     public function index()
     {
-        $transactions = Auth::user()->customerTransactions()
-            ->with(['merchant'])
+        $transactions = Auth::user()->orders()
             ->latest()
             ->paginate(10);
 

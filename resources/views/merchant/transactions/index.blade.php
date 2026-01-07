@@ -12,6 +12,8 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference
                         </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Channel
@@ -27,6 +29,9 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                         {{ $transaction->reference_id }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                        {{ $orders[$transaction->invoice_id]->order->product_name ?? 'Digital Product' }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">IDR
                                         {{ number_format($transaction->amount, 0, ',', '.') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

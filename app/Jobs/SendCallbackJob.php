@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\Transaction;
-use App\Models\CallbackLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -36,42 +35,49 @@ class SendCallbackJob implements ShouldQueue
             return;
         }
 
+        // Resolve API Secret for the merchant
+        $apiKeyRecord = \App\Models\ApiKey::where('merchant_id', $merchant->id)->first();
+        if (!$apiKeyRecord) {
+            return;
+        }
+
         $payload = [
             'invoice_id' => $this->transaction->invoice_id,
-            'status' => $this->transaction->status,
+            'status' => $this->transaction->status === 'SUCCESS' ? 'paid' : strtolower($this->transaction->status),
             'amount' => $this->transaction->amount,
-            'payment_channel' => $this->transaction->payment_channel,
-            'paid_at' => $this->transaction->paid_at ? $this->transaction->paid_at->toIso8601String() : null,
             'timestamp' => now()->timestamp,
         ];
 
         // Sign the payload
-        $signature = $signatureService->generate($payload, $merchant->api_secret);
-
-        $log = CallbackLog::create([
-            'transaction_id' => $this->transaction->id,
-            'payload' => json_encode($payload),
-            'attempts' => 1,
-        ]);
+        $signature = $signatureService->generate($payload, $apiKeyRecord->api_secret);
 
         try {
             $response = Http::withHeaders([
                 'X-Signature' => $signature,
                 'Content-Type' => 'application/json',
-            ])->post($merchant->callback_url, $payload);
+            ])->timeout(5)->post($merchant->callback_url, $payload);
 
-            $log->update([
-                'response_status' => $response->status(),
-                'response_body' => $response->body(),
+            // Log attempt
+            $this->transaction->callbackAttempts()->create([
+                'callback_url' => $merchant->callback_url,
+                'response_code' => $response->status(),
+                'status' => $response->successful() ? 'SUCCESS' : 'FAILED',
             ]);
+
+            // If success, log total action
+            if ($response->successful()) {
+                $this->transaction->logs()->create([
+                    'action' => 'CALLBACK_SENT',
+                    'payload' => json_encode($payload),
+                ]);
+            }
 
         } catch (\Exception $e) {
-            $log->update([
-                'response_status' => 500,
-                'response_body' => $e->getMessage(),
+            $this->transaction->callbackAttempts()->create([
+                'callback_url' => $merchant->callback_url,
+                'response_code' => 500,
+                'status' => 'FAILED',
             ]);
-            
-            // Re-queue if needed, logic for retry can be here
         }
     }
 }

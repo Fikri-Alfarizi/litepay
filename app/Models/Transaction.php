@@ -6,18 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
+    protected $connection = 'gateway';
+
     protected $fillable = [
         'merchant_id', 
-        'user_id', 
-        'destination_number', 
-        'product_name',
         'invoice_id', 
         'amount', 
-        'fee',
-        'tax',
-        'total_amount',
-        'payment_channel', 
         'status', 
+        'payment_method',
         'paid_at', 
         'reference_id'
     ];
@@ -27,13 +23,13 @@ class Transaction extends Model
         return $this->belongsTo(Merchant::class);
     }
 
-    public function customer()
+    public function logs()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasMany(TransactionLog::class);
     }
 
-    public function website_callback_logs() // 'callback_logs' in db
+    public function callbackAttempts()
     {
-        return $this->hasMany(CallbackLog::class);
+        return $this->hasMany(CallbackAttempt::class);
     }
 }

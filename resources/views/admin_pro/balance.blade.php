@@ -84,7 +84,7 @@
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap text-right">
                                 <span class="text-xs font-bold text-green-600 dark:text-green-400">
-                                    + Rp {{ number_format($mutation->total_amount, 0, ',', '.') }}
+                                    + Rp {{ number_format($mutation->amount, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>

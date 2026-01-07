@@ -12,6 +12,8 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $connection = 'merchant';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -20,6 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'role',
+        'status',
         'password',
         'balance',
     ];
@@ -54,6 +58,11 @@ class User extends Authenticatable
     public function customerTransactions()
     {
         return $this->hasMany(Transaction::class, 'user_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id');
     }
 
     public function isCustomer()

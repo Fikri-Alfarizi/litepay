@@ -84,7 +84,7 @@
                                 {{ $transaction->merchant->name ?? 'System' }}
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap">
-                                <span class="text-xs font-bold text-gray-800 dark:text-gray-100">Rp {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>
+                                <span class="text-xs font-bold text-gray-800 dark:text-gray-100">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</span>
                             </td>
                             <td class="px-4 py-2.5 whitespace-nowrap">
                                 @php $status = $transaction->status; @endphp

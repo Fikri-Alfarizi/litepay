@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Settlement extends Model
 {
+    protected $connection = 'gateway';
+
     protected $fillable = [
         'merchant_id',
         'bank_name',

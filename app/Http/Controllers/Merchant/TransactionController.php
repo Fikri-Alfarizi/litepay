@@ -19,7 +19,14 @@ class TransactionController extends Controller
 
         $transactions = $merchant->transactions()->latest()->paginate(10);
 
-        return view('merchant.transactions.index', compact('transactions'));
+        // Fetch corresponding Orders from Merchant DB
+        $invoiceIds = $transactions->pluck('invoice_id')->toArray();
+        $orders = \App\Models\OrderPayment::with('order')
+            ->whereIn('invoice_id', $invoiceIds)
+            ->get()
+            ->keyBy('invoice_id');
+
+        return view('merchant.transactions.index', compact('transactions', 'orders'));
     }
 
     public function show(Transaction $transaction)
@@ -30,6 +37,10 @@ class TransactionController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        return view('merchant.transactions.show', compact('transaction'));
+        $orderPayment = \App\Models\OrderPayment::with('order')
+            ->where('invoice_id', $transaction->invoice_id)
+            ->first();
+
+        return view('merchant.transactions.show', compact('transaction', 'orderPayment'));
     }
 }

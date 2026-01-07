@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('role')->default('merchant'); // admin, merchant
+            $table->string('status')->default('active'); // active, banned
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
