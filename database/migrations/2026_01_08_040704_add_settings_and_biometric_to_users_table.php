@@ -10,10 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::connection('merchant')->table('users', function (Blueprint $table) {
-            $table->json('settings')->nullable()->after('password');
-            $table->string('biometric_token')->nullable()->after('settings');
-        });
+        if (!Schema::connection('merchant')->hasColumn('users', 'settings')) {
+            Schema::connection('merchant')->table('users', function (Blueprint $table) {
+                $table->json('settings')->nullable()->after('password');
+                $table->string('biometric_token')->nullable()->after('settings');
+            });
+        }
     }
 
     /**

@@ -29,6 +29,7 @@ class User extends Authenticatable
         'pin',
         'settings',
         'biometric_token',
+        'face_descriptor',
     ];
 
     /**

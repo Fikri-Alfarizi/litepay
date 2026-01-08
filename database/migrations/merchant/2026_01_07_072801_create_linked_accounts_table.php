@@ -4,21 +4,22 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::connection('merchant')->create('linked_accounts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('provider'); // dana, ovo, gopay, shopeepay
-            $table->string('account_number');
-            $table->string('account_name')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::connection('merchant')->hasTable('linked_accounts')) {
+            Schema::connection('merchant')->create('linked_accounts', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('provider'); // dana, ovo, gopay, shopeepay
+                $table->string('account_number');
+                $table->string('account_name')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

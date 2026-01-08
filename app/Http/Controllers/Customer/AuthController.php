@@ -69,18 +69,58 @@ class AuthController extends Controller
     public function loginBiometric(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'token' => 'required|string',
+            'face_descriptor' => 'required|array',
         ]);
 
-        $user = User::where('email', $request->email)->where('role', 'customer')->first();
+        // Get all customers with biometric enabled
+        $users = User::where('role', 'customer')
+            ->whereNotNull('face_descriptor')
+            ->whereNotNull('biometric_token')
+            ->get();
 
-        if ($user && $user->biometric_token === $request->token && ($user->settings['biometric_enabled'] ?? false)) {
-            Auth::login($user);
-            return redirect()->route('store.index');
+        $liveDescriptor = $request->face_descriptor;
+        $bestMatch = null;
+        $bestDistance = PHP_FLOAT_MAX;
+        $threshold = 0.5; // Lower distance = better match
+
+        foreach ($users as $user) {
+            $storedDescriptor = json_decode($user->face_descriptor, true);
+
+            if (!$storedDescriptor || count($storedDescriptor) !== count($liveDescriptor)) {
+                continue;
+            }
+
+            // Calculate euclidean distance
+            $distance = 0;
+            for ($i = 0; $i < count($liveDescriptor); $i++) {
+                $distance += pow($liveDescriptor[$i] - $storedDescriptor[$i], 2);
+            }
+            $distance = sqrt($distance);
+
+            if ($distance < $bestDistance) {
+                $bestDistance = $distance;
+                $bestMatch = $user;
+            }
         }
 
-        return back()->withErrors(['email' => 'Face ID verification failed. Please use password.']);
+        // Check if best match is within threshold
+        if ($bestMatch && $bestDistance < $threshold && ($bestMatch->settings['biometric_enabled'] ?? false)) {
+            Auth::login($bestMatch);
+            $request->session()->regenerate();
+
+            // Return JSON for AJAX request
+            return response()->json([
+                'success' => true,
+                'redirect' => route('store.index'),
+                'user' => $bestMatch->name,
+                'distance' => round($bestDistance, 3)
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Face not recognized. Please use password.'
+        ], 401);
     }
 
     public function logout(Request $request)

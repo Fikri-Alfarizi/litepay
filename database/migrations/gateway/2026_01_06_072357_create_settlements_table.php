@@ -4,24 +4,25 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::connection('gateway')->create('settlements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('merchant_id')->constrained()->cascadeOnDelete();
-            $table->string('bank_name');
-            $table->string('bank_account_number');
-            $table->string('bank_account_name');
-            $table->decimal('amount', 15, 2);
-            $table->enum('status', ['pending', 'processed', 'rejected'])->default('pending');
-            $table->timestamp('processed_at')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::connection('gateway')->hasTable('settlements')) {
+            Schema::connection('gateway')->create('settlements', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('merchant_id')->constrained()->cascadeOnDelete();
+                $table->string('bank_name');
+                $table->string('bank_account_number');
+                $table->string('bank_account_name');
+                $table->decimal('amount', 15, 2);
+                $table->enum('status', ['pending', 'processed', 'rejected'])->default('pending');
+                $table->timestamp('processed_at')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -46,7 +46,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
 
 // Merchant & Admin Dashboard Redirections (Hidden manually for now inside auth logic if you want)
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('store.index');
 })->middleware(['auth'])->name('dashboard');
 
 // Admin Routes

@@ -67,5 +67,16 @@ class MerchantSeeder extends Seeder
                 'status' => 'active',
             ]
         );
+
+        // Customer User (Fikri)
+        User::firstOrCreate(
+            ['email' => 'fikri@gmail.com'],
+            [
+                'name' => 'Fikri Alfarizi',
+                'password' => Hash::make('password'),
+                'role' => 'customer',
+                'settings' => ['notifications' => ['tx_alerts' => true]]
+            ]
+        );
     }
 }

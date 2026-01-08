@@ -73,20 +73,28 @@ class SettingsController extends Controller
     {
         $request->validate([
             'enabled' => 'required|boolean',
-            'token' => 'nullable|string'
+            'token' => 'nullable|string',
+            'face_descriptor' => 'nullable|array'
         ]);
 
         $user = Auth::user();
 
         if ($request->enabled) {
-            // Enable: Save token
+            // Enable: Save token and face descriptor
             $user->biometric_token = $request->token ?? 'bio_' . uniqid();
+
+            // Store face descriptor as JSON string
+            if ($request->face_descriptor) {
+                $user->face_descriptor = json_encode($request->face_descriptor);
+            }
+
             $settings = $user->settings ?? [];
             $settings['biometric_enabled'] = true;
             $user->settings = $settings;
         } else {
-            // Disable: Clear token
+            // Disable: Clear token and face descriptor
             $user->biometric_token = null;
+            $user->face_descriptor = null;
             $settings = $user->settings ?? [];
             $settings['biometric_enabled'] = false;
             $user->settings = $settings;
