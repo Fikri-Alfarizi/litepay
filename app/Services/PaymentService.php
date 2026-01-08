@@ -36,8 +36,10 @@ class PaymentService
         // 3. Gateway DB: Create Transaction
         $transaction = Transaction::create([
             'merchant_id' => $merchant->id,
+            'user_id' => $data['user_id'] ?? null,
             'invoice_id' => $invoiceId,
             'amount' => $totalAmount, // Gateway stores total amount to be paid
+            'product_name' => $data['product_name'] ?? 'Payment',
             'status' => 'PENDING',
             'payment_method' => 'QRIS',
             'reference_id' => $referenceId,
@@ -51,6 +53,14 @@ class PaymentService
 
         // Update OrderPayment with Gateway reference
         $orderPayment->update(['gateway_transaction_id' => $transaction->id]);
+
+        // 5. Notify User: Pending Payment (Inbox)
+        \App\Models\Inbox::create([
+            'user_id' => $order->user_id,
+            'title' => 'Menunggu Pembayaran',
+            'message' => "Segera selesaikan pembayaran untuk invoice {$invoiceId} senilai Rp " . number_format($totalAmount, 0, ',', '.'),
+            'type' => 'info' // Use 'info' for yellow/pending
+        ]);
 
         return $transaction;
     }
@@ -113,8 +123,18 @@ class PaymentService
                             }
                         }
                     }
-            }
                 }
+            } elseif ($status === 'FAILED') {
+                 // Update Pending Notification to Failed/Cancelled
+                 \App\Models\Inbox::where('user_id', $orderPayment->order->user_id)
+                    ->where('message', 'LIKE', "%{$transaction->invoice_id}%")
+                    ->where('title', 'Menunggu Pembayaran')
+                    ->update([
+                        'title' => 'Pembayaran Dibatalkan',
+                        'message' => "Pembayaran untuk invoice {$transaction->invoice_id} telah dibatalkan.",
+                        'type' => 'error'
+                    ]);
+            }
         }
 
         // 4. Dispatch Callback (Gateway -> Merchant notification)

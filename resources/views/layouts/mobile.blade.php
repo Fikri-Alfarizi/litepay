@@ -20,37 +20,97 @@
         
         @yield('content')
 
-        <!-- QR Scanner Overlay -->
-        <div id="scanner-overlay" 
-             class="fixed inset-0 z-[100] bg-black translate-y-full transition-transform duration-500 ease-in-out flex flex-col items-center justify-center max-w-md mx-auto">
-            <!-- Close Button -->
-            <button onclick="toggleScanner(false)" 
-               class="absolute top-6 left-6 z-[110] bg-white/20 backdrop-blur-md p-3 rounded-full text-white hover:bg-white/30 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-            </button>
+        <!-- QR Scanner Overlay (Bottom Sheet) -->
+        <div id="scanner-container" class="fixed inset-x-0 bottom-0 top-0 z-[100] hidden flex flex-col justify-end overflow-hidden max-w-md mx-auto">
+             <!-- Backdrop -->
+             <div id="scanner-backdrop" onclick="toggleScanner(false)" class="absolute inset-0 bg-black/60 transition-opacity opacity-0 duration-300"></div>
 
-            <!-- Scanner UI -->
-            <div class="relative w-full px-6 text-center">
-                <div class="mb-8">
-                    <h2 class="text-white text-xl font-bold mb-2">Scan QR Code</h2>
-                    <p class="text-gray-400 text-sm">Posisikan kode QR di dalam kotak</p>
+             <!-- Scanner Sheet -->
+             <div id="scanner-sheet" 
+                 class="relative w-full bg-white rounded-t-[2rem] shadow-2xl transform translate-y-full transition-transform duration-300 ease-out z-[110] flex flex-col h-[85%]">
+                
+                <!-- DANA HEADER -->
+                <div class="flex justify-between items-center px-6 py-4 bg-white border-b border-gray-50 flex-shrink-0">
+                    <!-- Left: DANA Protection -->
+                    <div class="flex items-center gap-2 opacity-90">
+                         <svg class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                        <div class="flex flex-col leading-none">
+                            <span class="text-[9px] font-bold text-gray-500">DANA</span>
+                            <span class="text-[9px] font-bold text-gray-500">PROTECTION</span>
+                        </div>
+                    </div>
+
+                    <!-- Center: PAY -->
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs p-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 4H3a2 2 0 00-2 2v12a2 2 0 002 2h18a2 2 0 002-2V6a2 2 0 00-2-2zM5 15h3a1 1 0 011 1v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1a1 1 0 011-1zm3-6H5a1 1 0 01-1-1V7a1 1 0 011-1h3a1 1 0 011 1v1a1 1 0 01-1 1z"/></svg>
+                        </div>
+                        <span class="font-bold text-blue-500 text-base">PAY</span>
+                    </div>
+                    
+                    <!-- Right Spacer -->
+                     <button onclick="toggleScanner(false)" class="p-1">
+                         <span class="text-blue-500 font-bold text-[10px]">Help</span>
+                     </button>
                 </div>
 
-                <!-- Focus Area -->
-                <div class="relative aspect-square w-full border-2 border-white/20 rounded-3xl overflow-hidden mb-8">
-                    <video id="scanner-video" class="w-full h-full object-cover"></video>
-                    
-                    <!-- Scanner Overlay Rings -->
-                    <div class="absolute inset-0 border-[40px] border-black/40"></div>
-                    <div class="absolute inset-[40px] border-2 border-blue-500 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-                        <!-- Scanner Laser Line -->
-                        <div class="absolute w-full h-0.5 bg-blue-500 top-0 animate-[scan_2s_ease-in-out_infinite]"></div>
+                <!-- Scanner Viewfinder Container -->
+                <div class="flex-1 bg-white relative px-4 flex flex-col items-center justify-start pt-6">
+                     <!-- Viewfinder -->
+                    <div class="relative w-full max-w-[260px] aspect-[3/4] rounded-[2rem] overflow-hidden bg-black shadow-inner border-[3px] border-white ring-1 ring-gray-100">
+                        <video id="scanner-video" class="w-full h-full object-cover opacity-90"></video>
+                        
+                        <!-- Top Icons Overlay -->
+                         <div class="absolute top-4 left-4 z-10">
+                             <button class="bg-black/20 hover:bg-black/40 w-9 h-9 rounded-full text-white backdrop-blur-md flex items-center justify-center transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                             </button>
+                         </div>
+                         <div class="absolute top-4 right-4 z-10">
+                             <button class="bg-black/20 hover:bg-black/40 w-9 h-9 rounded-full text-white backdrop-blur-md flex items-center justify-center transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                             </button>
+                         </div>
+                         
+                         <!-- Corner Markers -->
+                          <div class="absolute inset-5 border-[2px] border-white/40 rounded-2xl pointer-events-none"></div>
+                          
+                          <!-- Animated Scan Line -->
+                          <div class="absolute inset-0 pointer-events-none">
+                              <div class="w-full h-0.5 bg-blue-400/80 absolute top-0 animate-[scan_2s_ease-in-out_infinite] shadow-[0_0_20px_rgba(96,165,250,0.6)]"></div>
+                          </div>
                     </div>
                 </div>
 
-                <p class="text-gray-500 text-xs italic">Membutuhkan izin kamera untuk melanjutkan</p>
+                 <!-- Bottom Action Bar -->
+                <div class="bg-white px-6 pb-6 pt-2 flex justify-between items-end text-xs font-medium text-gray-500 w-full flex-shrink-0">
+                     <!-- Pindai -->
+                     <button class="flex flex-col items-center gap-2 group w-16">
+                        <div class="w-12 h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-700 group-hover:bg-gray-50 transition shadow-sm">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                        </div>
+                        <span class="text-gray-700 font-semibold">Pindai</span>
+                     </button>
+
+                     <!-- Tutup -->
+                     <button onclick="toggleScanner(false)" class="flex flex-col items-center gap-2 group w-16">
+                        <div class="w-12 h-12 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-700 group-hover:bg-gray-50 transition shadow-sm">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </div>
+                        <span class="text-gray-700 font-semibold">Tutup</span>
+                     </button>
+
+                     <!-- Tambah Kartu -->
+                     <button class="flex flex-col items-center gap-2 group w-16">
+                        <div class="w-12 h-12 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-700 group-hover:bg-gray-50 transition shadow-sm">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        </div>
+                        <span class="text-gray-700 font-semibold text-center leading-tight">Tambah Kartu</span>
+                     </button>
+                </div>
             </div>
         </div>
 
@@ -80,13 +140,13 @@
             </a>
 
             <!-- Scan (Center) -->
-            <button onclick="toggleScanner(true)" class="relative -top-5 flex flex-col items-center justify-center group outline-none">
-                <div class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-300 flex items-center justify-center transform group-hover:scale-110 transition border-4 border-white">
+            <button onclick="toggleScanner(true)" class="relative -top-6 flex flex-col items-center justify-center group outline-none">
+                <div class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-300 flex items-center justify-center border-4 border-white transition-transform active:scale-95 hover:scale-105">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 17h.01M8 11h.01M12 12h.01M16 11h.01M3 20h6M3 7h6M16 20h6M16 7h6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
                     </svg>
                 </div>
-                <span class="text-blue-600 font-bold mt-1">Scan</span>
+                <span class="text-blue-600 font-bold text-[10px] mt-1">Scan</span>
             </button>
 
             <!-- Inbox -->
@@ -126,11 +186,21 @@
         let scannerStream = null;
 
         function toggleScanner(show) {
-            const overlay = document.getElementById('scanner-overlay');
+            const container = document.getElementById('scanner-container');
+            const backdrop = document.getElementById('scanner-backdrop');
+            const sheet = document.getElementById('scanner-sheet');
             const video = document.getElementById('scanner-video');
 
             if (show) {
-                overlay.classList.remove('translate-y-full');
+                // Show container
+                container.classList.remove('hidden');
+                
+                // Animate In
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    sheet.classList.remove('translate-y-full');
+                }, 10);
+
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                         .then(function(stream) {
@@ -148,11 +218,18 @@
                     toggleScanner(false);
                 }
             } else {
-                overlay.classList.add('translate-y-full');
-                if (scannerStream) {
-                    scannerStream.getTracks().forEach(track => track.stop());
-                    scannerStream = null;
-                }
+                // Animate Out
+                backdrop.classList.add('opacity-0');
+                sheet.classList.add('translate-y-full');
+
+                // Hide container after animation
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                    if (scannerStream) {
+                        scannerStream.getTracks().forEach(track => track.stop());
+                        scannerStream = null;
+                    }
+                }, 300);
             }
         }
 

@@ -93,21 +93,7 @@
                 </div>
                 
                 <!-- QR details (hidden by default) -->
-                <div id="qris-details" class="hidden mt-4 pt-4 border-t">
-                        <a href="{{ route('gateway.simulator.show', $transaction->reference_id) }}" target="_blank" class="flex flex-col items-center group">
-                            <div class="bg-white p-2 rounded-xl mb-2 border-2 border-dashed border-blue-200 group-hover:border-blue-400 transition">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode(route('gateway.simulator.show', $transaction->reference_id)) }}" alt="QR Code" class="w-48 h-48 mix-blend-multiply">
-                            </div>
-                            <span class="text-[11px] text-blue-600 font-bold group-hover:underline mb-1">Click to Open Simulator</span>
-                        </a>
-                        <div class="mt-3 p-2 bg-yellow-50 rounded-lg text-left">
-                            <p class="text-[10px] text-yellow-700 italic leading-tight">
-                                <strong>💡 Phone Scan Tip:</strong> Access this site through your PC's <strong>Local IP</strong> (e.g. 192.168.x.x) so your phone can reach the simulator when scanned.
-                            </p>
-                        </div>
-                        <p class="text-[10px] text-center text-gray-400 mt-2">Ref: {{ $transaction->reference_id }}</p>
-                    </div>
-                </div>
+                <!-- QR details (Moved to Bottom Sheet) -->
             </label>
 
             <!-- Virtual Accounts (Mock) -->
@@ -195,6 +181,63 @@
 
 </div>
 
+    <!-- QRIS Bottom Sheet (DANA Style) -->
+    <div id="qris-bottom-sheet" class="fixed inset-0 z-50 hidden" style="z-index: 9999;">
+        <!-- Backdrop -->
+        <div onclick="closeQrisSheet()" class="absolute inset-0 bg-black/60 transition-opacity opacity-0" id="qris-backdrop"></div>
+        
+        <!-- Sheet -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl transform translate-y-full transition-transform duration-300 ease-out flex flex-col max-h-[85vh]" id="qris-sheet-content">
+            <!-- Handle Bar -->
+            <div class="w-full flex justify-center pt-3 pb-2" onclick="closeQrisSheet()">
+                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+
+            <!-- Header -->
+            <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-gray-800">QRIS Payment</h3>
+                <button onclick="closeQrisSheet()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 overflow-y-auto flex-1 flex flex-col items-center">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 w-full max-w-xs mx-auto relative group">
+                    <!-- QR Code -->
+                    <div class="aspect-square bg-white rounded-xl overflow-hidden flex items-center justify-center mb-2">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{ urlencode(route('gateway.simulator.show', $transaction->reference_id)) }}" 
+                             alt="QR Code" 
+                             class="w-full h-full object-contain mix-blend-multiply">
+                    </div>
+                    
+                    <!-- Logo Overlay (Optional decoration) -->
+                    <div class="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none">
+                         <div class="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100 flex items-center gap-1.5">
+                             <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                             <span class="text-xs font-bold text-gray-700">QRIS</span>
+                         </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-gray-800 font-bold text-lg mb-1">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</p>
+                <p class="text-center text-gray-500 text-sm mb-6">{{ $transaction->merchant->name }}</p>
+
+                <a href="{{ route('gateway.simulator.show', $transaction->reference_id) }}" target="_blank" 
+                   class="w-full bg-blue-50 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-100 transition flex items-center justify-center gap-2 mb-4">
+                    Open Simulator
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+                
+                <div class="w-full bg-yellow-50 p-3 rounded-xl border border-yellow-100">
+                     <p class="text-xs text-yellow-700 text-center">
+                        Scan this QR code with any supported e-wallet or banking app (DANA, OVO, GoPay, etc).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
     let selectedMethod = 'balance';
 
@@ -208,8 +251,9 @@
         // Show details and update button text
         const btn = document.getElementById('pay-btn');
         if (method === 'qris') {
-            document.getElementById('qris-details').classList.remove('hidden');
-            btn.innerText = 'Run Simulation (QRIS)';
+            // document.getElementById('qris-details').classList.remove('hidden'); // Removed inline
+            openQrisSheet();
+            btn.innerText = 'Pay using QRIS';
         } else if (method === 'va') {
             document.getElementById('va-details').classList.remove('hidden');
             btn.innerText = 'Run Simulation (VA)';
@@ -290,5 +334,38 @@
                 }
             });
     }, 3000);
+
+    // Bottom Sheet Logic
+    function openQrisSheet() {
+        const sheet = document.getElementById('qris-bottom-sheet');
+        const backdrop = document.getElementById('qris-backdrop');
+        const content = document.getElementById('qris-sheet-content');
+        
+        // Show container
+        sheet.classList.remove('hidden');
+        
+        // Animate in
+        setTimeout(() => {
+            backdrop.classList.remove('opacity-0');
+            content.classList.remove('translate-y-full');
+        }, 10);
+    }
+
+    function closeQrisSheet() {
+        const sheet = document.getElementById('qris-bottom-sheet');
+        const backdrop = document.getElementById('qris-backdrop');
+        const content = document.getElementById('qris-sheet-content');
+
+        // Animate out
+        backdrop.classList.add('opacity-0');
+        content.classList.add('translate-y-full');
+
+        // Hide container after animation
+        setTimeout(() => {
+            sheet.classList.add('hidden');
+            // Reset selection to default or keep it? User might want to try again.
+            // keeping it is fine.
+        }, 300);
+    }
 </script>
 @endsection

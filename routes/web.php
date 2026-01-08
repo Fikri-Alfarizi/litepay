@@ -29,6 +29,10 @@ Route::prefix('customer')->name('customer.')->group(function () {
         Route::post('profile/set-pin', [App\Http\Controllers\Customer\ProfileController::class, 'setPin'])->name('profile.set_pin');
         Route::get('inbox', [App\Http\Controllers\Customer\InboxController::class, 'index'])->name('inbox');
         Route::get('inbox/unread-count', [App\Http\Controllers\Customer\InboxController::class, 'getUnreadCount'])->name('inbox.unread');
+        
+        // Transaction Details
+        Route::get('transaction/{reference_id}', [App\Http\Controllers\Customer\TransactionController::class, 'show'])->name('transaction.show');
+        Route::get('transaction/invoice/{invoice_id}', [App\Http\Controllers\Customer\TransactionController::class, 'showByInvoice'])->name('transaction.invoice');
     });
 });
 
