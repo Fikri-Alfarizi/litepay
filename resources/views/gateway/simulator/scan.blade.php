@@ -31,6 +31,7 @@
 </div>
 
 <script>
+function simulatePay() {
     const pin = document.getElementById('pin-input').value;
     if (pin.length !== 6) {
         alert('Please enter your 6-digit PIN');
@@ -51,11 +52,17 @@
     })
     .then(res => res.json())
     .then(data => {
-        btn.innerText = '✅ Payment Sent';
-        setTimeout(() => {
-            alert('Payment notification sent to Merchant!');
-            window.close(); // Try to close tab if popped up
-        }, 1000);
+        if (data.message.includes('successfully')) {
+            btn.innerText = '✅ Payment Sent';
+            setTimeout(() => {
+                alert('Payment notification sent to Merchant!');
+                window.close(); // Try to close tab if popped up
+            }, 1000);
+        } else {
+            alert(data.message);
+            btn.disabled = false;
+            btn.innerText = 'Confirm & Pay';
+        }
     })
     .catch(err => {
         alert('Error simulating payment');

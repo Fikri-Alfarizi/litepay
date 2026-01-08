@@ -154,8 +154,29 @@
             </div>
         </div>
 
-        <button onclick="processPayment()" id="pay-btn" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition mb-4">
-            Pay Now
+        @auth
+            @if(!Auth::user()->pin)
+                <div class="bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
+                    <div class="flex gap-3">
+                        <div class="bg-red-100 p-2 rounded-full h-fit text-red-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-red-800 text-sm">PIN Belum Disetel</p>
+                            <p class="text-xs text-red-600 mb-3">Kamu harus set PIN dulu sebelum bisa bertransaksi demi keamanan akunmu.</p>
+                            <a href="{{ route('customer.profile') }}" class="inline-block bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                                Set PIN Sekarang
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endauth
+
+        <button onclick="processPayment()" id="pay-btn" 
+            class="w-full {{ auth()->check() && !auth()->user()->pin ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} text-white font-bold py-4 rounded-xl shadow-lg transition mb-4"
+            {{ auth()->check() && !auth()->user()->pin ? 'disabled' : '' }}>
+            {{ auth()->check() && !auth()->user()->pin ? 'PIN Belum Disetel' : 'Pay Now' }}
         </button>
         
         <a href="{{ route('checkout.cancel', $transaction->reference_id) }}" class="block text-center text-gray-500 font-medium text-sm">Cancel Transaction</a>
@@ -168,9 +189,11 @@
             <h3 class="font-bold text-lg mb-4 text-center">Enter PIN</h3>
             <p class="text-sm text-gray-500 text-center mb-6">Please enter your 6-digit PIN to confirm payment.</p>
             
-            <div class="flex justify-center gap-2 mb-6">
+            <div class="flex justify-center gap-2 mb-4">
                 <input type="password" id="pin-input" maxlength="6" class="w-full text-center text-3xl tracking-[1em] border-b-2 border-gray-200 focus:border-blue-500 focus:outline-none py-2" placeholder="••••••">
             </div>
+
+            <div id="pin-error" class="hidden text-red-500 text-xs text-center mb-4 font-bold"></div>
 
             <button onclick="submitPaymentWithPin()" id="confirm-pin-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition">
                 Confirm Pay
@@ -292,6 +315,10 @@
         btn.disabled = true;
         btn.innerText = 'Verifying...';
 
+        const errorEl = document.getElementById('pin-error');
+        errorEl.classList.add('hidden');
+        errorEl.innerText = '';
+
         fetch("{{ route('checkout.pay', $transaction->reference_id) }}", {
             method: 'POST',
             headers: {
@@ -308,17 +335,18 @@
             if (data.message === 'Payment Successful') {
                 window.location.href = "{{ route('checkout.success', $transaction->reference_id) }}";
             } else {
-                alert(data.message);
+                errorEl.innerText = data.message;
+                errorEl.classList.remove('hidden');
                 btn.disabled = false;
                 btn.innerText = 'Confirm Pay';
-                if (data.message === 'Incorrect PIN') {
-                    document.getElementById('pin-input').value = '';
-                    document.getElementById('pin-input').focus();
-                }
+                
+                document.getElementById('pin-input').value = '';
+                document.getElementById('pin-input').focus();
             }
         })
         .catch(err => {
-             alert('Error processing payment');
+             errorEl.innerText = 'Gagal memproses pembayaran. Silakan coba lagi.';
+             errorEl.classList.remove('hidden');
              btn.disabled = false;
              btn.innerText = 'Confirm Pay';
         });

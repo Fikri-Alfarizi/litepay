@@ -70,8 +70,12 @@ class CheckoutController extends Controller
         }
 
         // Validate PIN
+        if (!$user->pin) {
+            return response()->json(['message' => 'Anda belum menyetel PIN transaksi.'], 403);
+        }
+
         if (!\Hash::check($request->pin, $user->pin)) {
-            return response()->json(['message' => 'Incorrect PIN'], 400);
+            return response()->json(['message' => 'PIN yang Anda masukkan salah.'], 400);
         }
 
         $paymentMethod = $request->payment_method;

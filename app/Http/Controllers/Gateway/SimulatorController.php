@@ -49,8 +49,12 @@ class SimulatorController extends Controller
              return response()->json(['message' => 'User not found'], 404);
         }
 
+        if (!$user->pin) {
+            return response()->json(['message' => 'Anda belum menyetel PIN transaksi.'], 403);
+        }
+
         if (!\Hash::check($request->pin, $user->pin)) {
-            return response()->json(['message' => 'Incorrect PIN'], 400);
+            return response()->json(['message' => 'PIN yang Anda masukkan salah.'], 400);
         }
 
         // Simulate Gateway update -> triggers callback to Merchant
