@@ -268,17 +268,15 @@
         selectedMethod = method;
         
         // Hide all details first
-        document.getElementById('qris-details').classList.add('hidden');
-        document.getElementById('va-details').classList.add('hidden');
+        if(document.getElementById('va-details')) document.getElementById('va-details').classList.add('hidden');
 
         // Show details and update button text
         const btn = document.getElementById('pay-btn');
         if (method === 'qris') {
-            // document.getElementById('qris-details').classList.remove('hidden'); // Removed inline
             openQrisSheet();
             btn.innerText = 'Pay using QRIS';
         } else if (method === 'va') {
-            document.getElementById('va-details').classList.remove('hidden');
+            if(document.getElementById('va-details')) document.getElementById('va-details').classList.remove('hidden');
             btn.innerText = 'Run Simulation (VA)';
         } else {
             // Balance or Linked Account

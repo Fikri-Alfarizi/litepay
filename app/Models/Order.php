@@ -30,4 +30,9 @@ class Order extends Model
     {
         return $this->hasOne(OrderPayment::class);
     }
+
+    public function getGatewayReferenceIdAttribute()
+    {
+        return $this->payment?->transaction?->reference_id;
+    }
 }

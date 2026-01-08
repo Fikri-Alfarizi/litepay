@@ -36,7 +36,7 @@
                 </svg>
             </a>
 
-            <a href="#"
+            <a href="{{ route('customer.settings') }}"
                 class="flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition">
                 <div class="flex items-center gap-3">
                     <div class="bg-purple-100 p-2 rounded-lg text-purple-600">
@@ -59,29 +59,30 @@
         <!-- Linked Accounts -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6 p-4">
             <h3 class="font-bold text-gray-800 mb-4">Linked Accounts</h3>
-            
+
             <div class="space-y-4 mb-4">
                 @foreach($linkedAccounts as $account)
-                <div class="flex items-center justify-between border p-3 rounded-lg">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-xs">
-                            {{ strtoupper($account->provider) }}
+                    <div class="flex items-center justify-between border p-3 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-xs">
+                                {{ strtoupper($account->provider) }}
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 capitalize">{{ $account->provider }}</p>
+                                <p class="text-xs text-gray-500">{{ $account->account_number }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-gray-800 capitalize">{{ $account->provider }}</p>
-                            <p class="text-xs text-gray-500">{{ $account->account_number }}</p>
-                        </div>
+                        <form action="{{ route('customer.profile.unlink_account', $account->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 text-xs font-bold">Unlink</button>
+                        </form>
                     </div>
-                    <form action="{{ route('customer.profile.unlink_account', $account->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-500 text-xs font-bold">Unlink</button>
-                    </form>
-                </div>
                 @endforeach
             </div>
 
-            <button onclick="document.getElementById('link-modal').classList.remove('hidden')" class="w-full border border-blue-600 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-50 transition">
+            <button onclick="document.getElementById('link-modal').classList.remove('hidden')"
+                class="w-full border border-blue-600 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-50 transition">
                 + Link New Account
             </button>
         </div>
@@ -94,7 +95,8 @@
                     <p class="font-bold text-gray-800">Transaction PIN</p>
                     <p class="text-xs text-gray-500">{{ $user->pin ? 'PIN is set' : 'PIN not set' }}</p>
                 </div>
-                <button onclick="document.getElementById('pin-modal').classList.remove('hidden')" class="text-blue-600 font-bold text-sm">
+                <button onclick="document.getElementById('pin-modal').classList.remove('hidden')"
+                    class="text-blue-600 font-bold text-sm">
                     {{ $user->pin ? 'Change' : 'Set PIN' }}
                 </button>
             </div>
@@ -126,10 +128,13 @@
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                    <input type="text" name="account_number" class="w-full border rounded-lg p-3" placeholder="0812..." required>
+                    <input type="text" name="account_number" class="w-full border rounded-lg p-3" placeholder="0812..."
+                        required>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mb-2">Link Account</button>
-                <button type="button" onclick="document.getElementById('link-modal').classList.add('hidden')" class="w-full text-gray-500 py-3">Cancel</button>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mb-2">Link
+                    Account</button>
+                <button type="button" onclick="document.getElementById('link-modal').classList.add('hidden')"
+                    class="w-full text-gray-500 py-3">Cancel</button>
             </form>
         </div>
     </div>
@@ -142,14 +147,19 @@
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">New PIN (6 Digits)</label>
-                    <input type="password" name="pin" maxlength="6" class="w-full border rounded-lg p-3 text-center text-2xl tracking-widest" placeholder="••••••" required>
+                    <input type="password" name="pin" maxlength="6"
+                        class="w-full border rounded-lg p-3 text-center text-2xl tracking-widest" placeholder="••••••"
+                        required>
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Confirm PIN</label>
-                    <input type="password" name="pin_confirmation" maxlength="6" class="w-full border rounded-lg p-3 text-center text-2xl tracking-widest" placeholder="••••••" required>
+                    <input type="password" name="pin_confirmation" maxlength="6"
+                        class="w-full border rounded-lg p-3 text-center text-2xl tracking-widest" placeholder="••••••"
+                        required>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mb-2">Save PIN</button>
-                <button type="button" onclick="document.getElementById('pin-modal').classList.add('hidden')" class="w-full text-gray-500 py-3">Cancel</button>
+                <button type="button" onclick="document.getElementById('pin-modal').classList.add('hidden')"
+                    class="w-full text-gray-500 py-3">Cancel</button>
             </form>
         </div>
     </div>

@@ -27,6 +27,8 @@ class User extends Authenticatable
         'password',
         'balance',
         'pin',
+        'settings',
+        'biometric_token',
     ];
 
     /**
@@ -49,6 +51,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'settings' => 'array',
         ];
     }
     public function merchant()

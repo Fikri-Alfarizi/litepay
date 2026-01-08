@@ -39,23 +39,28 @@
                             </div>
                             <div class="text-right">
                                 <span class="block font-bold text-gray-800">Rp
-                                    {{ number_format($transaction->amount, 0, ',', '.') }}</span>
+                                    {{ number_format($transaction->total_amount, 0, ',', '.') }}</span>
                                 <span
                                     class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide
-                                            {{ $transaction->status === 'SUCCESS' ? 'bg-green-100 text-green-600' :
-                    ($transaction->status == 'PENDING' ? 'bg-yellow-100 text-yellow-600' : 'bg-red-100 text-red-600') }}">
+                                            {{ ($transaction->status === 'SUCCESS' || $transaction->status === 'PAID') ? 'bg-green-100 text-green-600' :
+                    (($transaction->status == 'PENDING' || $transaction->status == 'UNPAID') ? 'bg-yellow-100 text-yellow-600' : 'bg-red-100 text-red-600') }}">
                                     {{ $transaction->status }}
                                 </span>
                             </div>
                         </div>
                         <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                            <span class="text-xs text-gray-400 font-mono">{{ $transaction->gateway_reference_id }}</span>
-                            @if($transaction->status === 'PENDING')
-                                <a href="{{ route('checkout.show', $transaction->gateway_reference_id) }}"
-                                    class="text-xs font-bold text-blue-600 hover:underline">Pay Now</a>
+                            <span class="text-xs text-gray-400 font-mono">{{ $transaction->gateway_reference_id ?? '-' }}</span>
+                            
+                            @if($transaction->gateway_reference_id)
+                                @if($transaction->status === 'PENDING' || $transaction->status === 'UNPAID')
+                                    <a href="{{ route('checkout.show', $transaction->gateway_reference_id) }}"
+                                        class="text-xs font-bold text-blue-600 hover:underline">Pay Now</a>
+                                @else
+                                    <a href="{{ route('checkout.success', $transaction->gateway_reference_id) }}"
+                                        class="text-xs font-bold text-gray-500 hover:text-gray-800">View Receipt</a>
+                                @endif
                             @else
-                                <a href="{{ route('checkout.success', $transaction->gateway_reference_id) }}"
-                                    class="text-xs font-bold text-gray-500 hover:text-gray-800">View Receipt</a>
+                                <span class="text-xs text-gray-300 italic">Reference not available</span>
                             @endif
                         </div>
                     </div>

@@ -66,11 +66,28 @@ class AuthController extends Controller
         return redirect(route('store.index'));
     }
 
+    public function loginBiometric(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->where('role', 'customer')->first();
+
+        if ($user && $user->biometric_token === $request->token && ($user->settings['biometric_enabled'] ?? false)) {
+            Auth::login($user);
+            return redirect()->route('store.index');
+        }
+
+        return back()->withErrors(['email' => 'Face ID verification failed. Please use password.']);
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect(route('store.index'));
+        return redirect()->route('customer.login');
     }
 }

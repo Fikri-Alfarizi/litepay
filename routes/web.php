@@ -17,6 +17,7 @@ Route::prefix('customer')->name('customer.')->group(function () {
         Route::post('login', [App\Http\Controllers\Customer\AuthController::class, 'login'])->name('login.submit');
         Route::get('register', [App\Http\Controllers\Customer\AuthController::class, 'showRegister'])->name('register');
         Route::post('register', [App\Http\Controllers\Customer\AuthController::class, 'register'])->name('register.submit');
+        Route::post('login/biometric', [App\Http\Controllers\Customer\AuthController::class, 'loginBiometric'])->name('login.biometric');
     });
 
     Route::post('logout', [App\Http\Controllers\Customer\AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -29,7 +30,14 @@ Route::prefix('customer')->name('customer.')->group(function () {
         Route::post('profile/set-pin', [App\Http\Controllers\Customer\ProfileController::class, 'setPin'])->name('profile.set_pin');
         Route::get('inbox', [App\Http\Controllers\Customer\InboxController::class, 'index'])->name('inbox');
         Route::get('inbox/unread-count', [App\Http\Controllers\Customer\InboxController::class, 'getUnreadCount'])->name('inbox.unread');
-        
+
+        // Settings
+        Route::get('settings', [App\Http\Controllers\Customer\SettingsController::class, 'index'])->name('settings');
+        Route::post('settings/profile', [App\Http\Controllers\Customer\SettingsController::class, 'updateProfile'])->name('settings.profile');
+        Route::post('settings/password', [App\Http\Controllers\Customer\SettingsController::class, 'updatePassword'])->name('settings.password');
+        Route::post('settings/notifications', [App\Http\Controllers\Customer\SettingsController::class, 'toggleNotification'])->name('settings.notifications');
+        Route::post('settings/biometric', [App\Http\Controllers\Customer\SettingsController::class, 'updateBiometric'])->name('settings.biometric');
+
         // Transaction Details
         Route::get('transaction/{reference_id}', [App\Http\Controllers\Customer\TransactionController::class, 'show'])->name('transaction.show');
         Route::get('transaction/invoice/{invoice_id}', [App\Http\Controllers\Customer\TransactionController::class, 'showByInvoice'])->name('transaction.invoice');

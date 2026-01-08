@@ -20,4 +20,9 @@ class OrderPayment extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class, 'gateway_transaction_id');
+    }
 }
