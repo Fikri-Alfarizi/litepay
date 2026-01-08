@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id'); // Reference to user in merchant_db
             $table->string('name');
+            $table->string('api_key')->unique();
+            $table->string('api_secret');
             $table->string('callback_url')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();

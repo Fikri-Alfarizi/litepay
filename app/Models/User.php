@@ -26,6 +26,7 @@ class User extends Authenticatable
         'status',
         'password',
         'balance',
+        'pin',
     ];
 
     /**
@@ -53,6 +54,11 @@ class User extends Authenticatable
     public function merchant()
     {
         return $this->hasOne(Merchant::class);
+    }
+
+    public function linkedAccounts()
+    {
+        return $this->hasMany(LinkedAccount::class);
     }
 
     public function customerTransactions()

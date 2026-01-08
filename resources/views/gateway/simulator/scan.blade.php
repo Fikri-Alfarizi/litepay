@@ -15,7 +15,12 @@
         <p class="font-bold text-lg mb-6">{{ $transaction->merchant->name }}</p>
 
         <div class="text-3xl font-bold mb-2">Rp {{ number_format($transaction->amount, 0, ',', '.') }}</div>
-        <p class="text-xs text-gray-400 mb-8">Ref: {{ $transaction->reference_id }}</p>
+        <p class="text-xs text-gray-400 mb-6">Ref: {{ $transaction->reference_id }}</p>
+
+        <div class="mb-6">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Enter PIN to Confirm</label>
+            <input type="password" id="pin-input" maxlength="6" class="w-full text-center text-3xl tracking-[0.5em] border-b-2 border-gray-200 focus:border-blue-500 focus:outline-none py-2 font-bold text-gray-800" placeholder="••••••">
+        </div>
 
         <button onclick="simulatePay()" id="pay-btn" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition">
             Confirm & Pay
@@ -26,7 +31,12 @@
 </div>
 
 <script>
-function simulatePay() {
+    const pin = document.getElementById('pin-input').value;
+    if (pin.length !== 6) {
+        alert('Please enter your 6-digit PIN');
+        return;
+    }
+
     const btn = document.getElementById('pay-btn');
     btn.disabled = true;
     btn.innerText = 'Processing...';
@@ -36,7 +46,8 @@ function simulatePay() {
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
             'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ pin: pin })
     })
     .then(res => res.json())
     .then(data => {

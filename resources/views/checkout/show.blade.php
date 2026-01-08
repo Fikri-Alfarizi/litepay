@@ -51,11 +51,29 @@
                         @endauth
                     </div>
                 </div>
-                <!-- Selection Indicator -->
                 <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-200 peer-checked:border-blue-500 peer-checked:bg-blue-500 flex items-center justify-center">
                     <svg class="w-4 h-4 text-white hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                 </div>
             </label>
+
+            <!-- Linked Accounts -->
+            @foreach($linkedAccounts as $account)
+            <label class="block bg-white p-4 rounded-2xl shadow-sm cursor-pointer border-2 has-[:checked]:border-blue-500 transition relative overflow-hidden">
+                <input type="radio" name="payment_method" value="{{ $account->provider }}" class="peer hidden" onchange="togglePaymentMethod('{{ $account->provider }}')">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-xs uppercase">
+                        {{ $account->provider }}
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-bold text-gray-800 capitalize">{{ $account->provider }}</p>
+                        <p class="text-sm text-gray-500">{{ $account->account_number }}</p>
+                    </div>
+                </div>
+                <div class="absolute top-4 right-4 w-6 h-6 rounded-full border-2 border-gray-200 peer-checked:border-blue-500 peer-checked:bg-blue-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+            </label>
+            @endforeach
 
             <!-- QRIS -->
             <label class="block bg-white p-4 rounded-2xl shadow-sm cursor-pointer border-2 has-[:checked]:border-blue-500 transition relative">
@@ -158,6 +176,25 @@
     </div>
 </div>
 
+    <!-- PIN Modal -->
+    <div id="pin-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-end sm:items-center justify-center">
+        <div class="bg-white w-full sm:w-80 rounded-t-2xl sm:rounded-2xl p-6 relative">
+            <h3 class="font-bold text-lg mb-4 text-center">Enter PIN</h3>
+            <p class="text-sm text-gray-500 text-center mb-6">Please enter your 6-digit PIN to confirm payment.</p>
+            
+            <div class="flex justify-center gap-2 mb-6">
+                <input type="password" id="pin-input" maxlength="6" class="w-full text-center text-3xl tracking-[1em] border-b-2 border-gray-200 focus:border-blue-500 focus:outline-none py-2" placeholder="••••••">
+            </div>
+
+            <button onclick="submitPaymentWithPin()" id="confirm-pin-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition">
+                Confirm Pay
+            </button>
+            <button onclick="document.getElementById('pin-modal').classList.add('hidden')" class="w-full text-gray-500 py-3 mt-2">Cancel</button>
+        </div>
+    </div>
+
+</div>
+
 <script>
     let selectedMethod = 'balance';
 
@@ -177,44 +214,69 @@
             document.getElementById('va-details').classList.remove('hidden');
             btn.innerText = 'Run Simulation (VA)';
         } else {
+            // Balance or Linked Account
             btn.innerText = 'Pay Now (Rp {{ number_format($transaction->amount, 0, ',', '.') }})';
         }
     }
 
     function processPayment() {
+        // If interactive method (balance/linked), show PIN modal
+        if (selectedMethod === 'balance' || ['dana', 'ovo', 'gopay', 'shopeepay'].includes(selectedMethod)) {
+            document.getElementById('pin-modal').classList.remove('hidden');
+            document.getElementById('pin-input').value = '';
+            document.getElementById('pin-input').focus();
+            return;
+        }
+
+        // External methods (QRIS/VA) - Use Simulator
         const btn = document.getElementById('pay-btn');
         btn.disabled = true;
         btn.innerText = 'Processing...';
-
-        let url = "{{ route('checkout.pay_balance', $transaction->reference_id) }}";
         
-        // If external method, use simulator
-        if (selectedMethod !== 'balance') {
-            window.open("{{ route('gateway.simulator.show', $transaction->reference_id) }}", "_blank");
-            btn.innerText = 'Waiting for Payment...';
+        window.open("{{ route('gateway.simulator.show', $transaction->reference_id) }}", "_blank");
+        btn.innerText = 'Waiting for Payment...';
+    }
+
+    function submitPaymentWithPin() {
+        const pin = document.getElementById('pin-input').value;
+        if (pin.length !== 6) {
+            alert('Please enter a 6-digit PIN');
             return;
         }
-        
-        fetch(url, {
+
+        const btn = document.getElementById('confirm-pin-btn');
+        btn.disabled = true;
+        btn.innerText = 'Verifying...';
+
+        fetch("{{ route('checkout.pay', $transaction->reference_id) }}", {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({
+                pin: pin,
+                payment_method: selectedMethod
+            })
         })
         .then(res => res.json())
         .then(data => {
             if (data.message === 'Payment Successful') {
                 window.location.href = "{{ route('checkout.success', $transaction->reference_id) }}";
             } else {
-                alert('Error: ' + data.message);
+                alert(data.message);
                 btn.disabled = false;
-                btn.innerText = 'Retry Payment';
+                btn.innerText = 'Confirm Pay';
+                if (data.message === 'Incorrect PIN') {
+                    document.getElementById('pin-input').value = '';
+                    document.getElementById('pin-input').focus();
+                }
             }
         })
         .catch(err => {
              alert('Error processing payment');
              btn.disabled = false;
+             btn.innerText = 'Confirm Pay';
         });
     }
 

@@ -26,12 +26,31 @@ class SimulatorController extends Controller
     /**
      * Handle the "Pay" button inside the simulator
      */
-    public function pay($reference, PaymentService $paymentService)
+    public function pay(Request $request, $reference, PaymentService $paymentService)
     {
         $transaction = Transaction::where('reference_id', $reference)->firstOrFail();
 
         if ($transaction->status !== 'PENDING') {
             return response()->json(['message' => 'Already processed'], 400);
+        }
+
+        // Validate PIN
+        // In this simulation, we access the Merchant DB (OrderPayment) to find the User
+        // This simulates the "Bank App" knowing the user
+        $orderPayment = \App\Models\OrderPayment::where('invoice_id', $transaction->invoice_id)->first();
+        
+        if (!$orderPayment) {
+             return response()->json(['message' => 'Order not found for this transaction'], 404);
+        }
+
+        $user = $orderPayment->order->user;
+
+        if (!$user) {
+             return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if (!\Hash::check($request->pin, $user->pin)) {
+            return response()->json(['message' => 'Incorrect PIN'], 400);
         }
 
         // Simulate Gateway update -> triggers callback to Merchant

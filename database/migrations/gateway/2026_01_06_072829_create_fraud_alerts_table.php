@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fraud_alerts', function (Blueprint $table) {
+        Schema::connection('gateway')->create('fraud_alerts', function (Blueprint $table) {
             $table->id();
             // nullable because sometimes fraud checks happen before transaction persistence, 
             // but for this UI it's usually tied to one.

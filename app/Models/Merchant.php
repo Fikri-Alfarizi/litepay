@@ -8,7 +8,7 @@ class Merchant extends Model
 {
     protected $connection = 'gateway';
 
-    protected $fillable = ['user_id', 'name', 'status'];
+    protected $fillable = ['user_id', 'name', 'api_key', 'api_secret', 'status'];
 
     public function user()
     {

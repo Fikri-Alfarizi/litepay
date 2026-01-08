@@ -93,8 +93,28 @@ class PaymentService
                 ]);
 
                 // Balance Increment Simulation if Top Up
-                // (Assuming user logic exists or we map Product info elsewhere)
+                if ($orderPayment->order->product_name === 'Top Up Balance') {
+                    $createLog = $transaction->logs()->where('action', 'CREATE')->first();
+                    if ($createLog) {
+                        $payload = json_decode($createLog->payload, true);
+                        $topUpAmount = $payload['amount'] ?? 0;
+
+                        if ($topUpAmount > 0) {
+                            $user = $orderPayment->order->user;
+                            if ($user) {
+                                $user->increment('balance', $topUpAmount);
+
+                                \App\Models\Inbox::create([
+                                    'user_id' => $user->id,
+                                    'title' => 'Top Up Berhasil!',
+                                    'message' => "Saldo Anda telah bertambah sebesar Rp " . number_format($topUpAmount, 0, ',', '.'),
+                                    'type' => 'success'
+                                ]);
+                            }
+                        }
+                    }
             }
+                }
         }
 
         // 4. Dispatch Callback (Gateway -> Merchant notification)

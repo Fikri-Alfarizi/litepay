@@ -24,6 +24,9 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('history', [App\Http\Controllers\Customer\HistoryController::class, 'index'])->name('history');
         Route::get('profile', [App\Http\Controllers\Customer\ProfileController::class, 'index'])->name('profile');
+        Route::post('profile/link-account', [App\Http\Controllers\Customer\ProfileController::class, 'linkAccount'])->name('profile.link_account');
+        Route::delete('profile/link-account/{id}', [App\Http\Controllers\Customer\ProfileController::class, 'unlinkAccount'])->name('profile.unlink_account');
+        Route::post('profile/set-pin', [App\Http\Controllers\Customer\ProfileController::class, 'setPin'])->name('profile.set_pin');
         Route::get('inbox', [App\Http\Controllers\Customer\InboxController::class, 'index'])->name('inbox');
         Route::get('inbox/unread-count', [App\Http\Controllers\Customer\InboxController::class, 'getUnreadCount'])->name('inbox.unread');
     });
@@ -76,7 +79,7 @@ Route::get('checkout/{reference}', [App\Http\Controllers\CheckoutController::cla
 Route::get('checkout/{reference}/success', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('checkout/{reference}/status', [App\Http\Controllers\CheckoutController::class, 'checkStatus'])->name('checkout.status');
 Route::post('checkout/{reference}/simulate', [App\Http\Controllers\CheckoutController::class, 'simulatePay'])->name('checkout.simulate');
-Route::post('checkout/{reference}/pay-balance', [App\Http\Controllers\CheckoutController::class, 'payWithBalance'])->name('checkout.pay_balance')->middleware('auth');
+Route::post('checkout/{reference}/pay', [App\Http\Controllers\CheckoutController::class, 'pay'])->name('checkout.pay')->middleware('auth');
 Route::get('checkout/{reference}/cancel', [App\Http\Controllers\CheckoutController::class, 'cancel'])->name('checkout.cancel');
 
 Route::middleware('guest')->group(function () {

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('settlements', function (Blueprint $table) {
+        Schema::connection('gateway')->create('settlements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('merchant_id')->constrained()->cascadeOnDelete();
             $table->string('bank_name');
