@@ -5,10 +5,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PublicPaymentController;
 
-// Storefront (Buyer POV)
-Route::get('/', [App\Http\Controllers\StoreController::class, 'index'])->name('store.index');
-Route::get('/buy/{category}', [App\Http\Controllers\StoreController::class, 'showCategory'])->name('store.category');
-Route::post('/buy', [App\Http\Controllers\StoreController::class, 'purchase'])->name('store.purchase');
+// Homepage - Redirect ke admin-pro atau login
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('admin_pro.dashboard');
+    }
+    return redirect()->route('login');
+})->name('home');
+
+// Store Routes (Payment Gateway Frontend)
+Route::prefix('store')->name('store.')->group(function () {
+    Route::get('/', [App\Http\Controllers\StoreController::class, 'index'])->name('index');
+    Route::get('/buy/{category}', [App\Http\Controllers\StoreController::class, 'showCategory'])->name('category');
+    Route::post('/buy', [App\Http\Controllers\StoreController::class, 'purchase'])->name('purchase');
+});
+
 
 // Customer Auth & History
 Route::prefix('customer')->name('customer.')->group(function () {
@@ -97,6 +108,8 @@ Route::get('checkout/{reference}/cancel', [App\Http\Controllers\CheckoutControll
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'loginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::get('/register', [AuthController::class, 'registerForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');

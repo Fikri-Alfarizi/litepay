@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - LitePay</title>
+    <title>Register - LitePay</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         * {
             margin: 0;
@@ -31,9 +32,10 @@
             align-items: center;
             padding: 40px;
             background: #fff;
+            overflow-y: auto;
         }
 
-        .login-container {
+        .register-container {
             width: 100%;
             max-width: 400px;
             text-align: center;
@@ -66,8 +68,14 @@
         h1 {
             font-size: 32px;
             color: #111827;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-weight: 700;
+        }
+
+        .subtitle {
+            color: #6B7280;
+            font-size: 14px;
+            margin-bottom: 30px;
         }
 
         .btn-google {
@@ -107,14 +115,20 @@
             letter-spacing: 0.5px;
         }
 
-        .divider::before, .divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
             border-bottom: 1px solid #E5E7EB;
         }
 
-        .divider::before { margin-right: 15px; }
-        .divider::after { margin-left: 15px; }
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
 
         .form-group {
             text-align: left;
@@ -150,36 +164,47 @@
             background-color: white;
         }
 
-        .form-utilities {
+        .form-control.error {
+            border-color: #DC2626;
+        }
+
+        .form-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            font-size: 13px;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
         }
 
         .checkbox-group {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             color: #1F2937;
             font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 25px;
+            text-align: left;
         }
 
         .checkbox-group input {
             margin-right: 8px;
+            margin-top: 2px;
             width: 16px;
             height: 16px;
             cursor: pointer;
             accent-color: #4F46E5;
+            flex-shrink: 0;
         }
 
-        .forgot-link {
+        .checkbox-group a {
             color: #EC4899;
             text-decoration: none;
-            font-weight: 500;
         }
 
-        .forgot-link:hover { text-decoration: underline; }
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
 
         .btn-submit {
             width: 100%;
@@ -253,7 +278,7 @@
             font-size: 16px;
             margin-bottom: 10px;
         }
-        
+
         .academy-logo i {
             margin-right: 8px;
         }
@@ -278,11 +303,12 @@
             letter-spacing: 0.5px;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
         }
 
         .btn-academy:hover {
             border-color: #374151;
-            background: rgba(0,0,0,0.02);
+            background: rgba(0, 0, 0, 0.02);
         }
 
         .illustration-container {
@@ -296,63 +322,108 @@
         .illustration-container img {
             max-width: 80%;
             height: auto;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.05));
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.05));
+        }
+
+        .features-list {
+            margin-top: auto;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .feature-item i {
+            width: 24px;
+            height: 24px;
+            background-color: #4F46E5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
         @media (max-width: 900px) {
             .right-section {
                 display: none;
             }
+
             .left-section {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="left-section">
-        <div class="login-container">
+        <div class="register-container">
 
-            <h1>Welcome Back</h1>
+            <h1>Create Account</h1>
+            <p class="subtitle">Start managing your payments today</p>
 
             @if ($errors->any())
                 <div class="alert-error">
-                    <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
+                    <i class="fas fa-exclamation-circle"></i>
+                    @foreach ($errors->all() as $error)
+                        {{ $error }}<br>
+                    @endforeach
                 </div>
             @endif
 
             <button class="btn-google" type="button">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo">
-                Log in with Google
+                Sign up with Google
             </button>
 
-            <div class="divider">OR LOGIN WITH EMAIL</div>
+            <div class="divider">OR REGISTER WITH EMAIL</div>
 
-            <form action="{{ route('login.submit') }}" method="POST">
+            <form action="{{ route('register.submit') }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" class="form-control" placeholder="admin@litepay.com" value="{{ old('email') }}" required>
+                    <label>Full Name</label>
+                    <input type="text" name="name" class="form-control @error('name') error @enderror"
+                        placeholder="John Doe" value="{{ old('name') }}" required>
                 </div>
-                
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" class="form-control @error('email') error @enderror"
+                        placeholder="john@example.com" value="{{ old('email') }}" required>
+                </div>
+
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    <input type="password" name="password" class="form-control @error('password') error @enderror"
+                        placeholder="Min. 8 characters" required>
                 </div>
 
-                <div class="form-utilities">
-                    <label class="checkbox-group">
-                        <input type="checkbox" name="remember" checked> Keep me logged in
-                    </label>
-                    <a href="#" class="forgot-link">Forgot your password?</a>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="password_confirmation" class="form-control"
+                        placeholder="Confirm your password" required>
                 </div>
 
-                <button type="submit" class="btn-submit">Log In</button>
+                <label class="checkbox-group">
+                    <input type="checkbox" name="terms" required>
+                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                </label>
+
+                <button type="submit" class="btn-submit">Create Account</button>
             </form>
 
             <div class="footer-text">
-                Don't have an account? <a href="{{ route('register') }}">Sign up</a>
+                Already have an account? <a href="{{ route('login') }}">Log in</a>
             </div>
         </div>
     </div>
@@ -361,10 +432,10 @@
         <div class="right-header">
             <div class="academy-branding">
                 <div class="academy-logo">
-                    <i class="fas fa-shield-halved"></i> Payment Gateway
+                    <i class="fas fa-rocket"></i> Get Started
                 </div>
-                <p class="academy-desc">Secure, fast, and reliable payment processing for your business. Accept payments from anywhere.</p>
-                <a href="{{ route('store.index') }}" class="btn-academy">Open Store</a>
+                <p class="academy-desc">Join thousands of businesses using LitePay for secure payment processing.</p>
+                <a href="{{ route('store.index') }}" class="btn-academy">Explore Features</a>
             </div>
         </div>
 
@@ -374,4 +445,5 @@
     </div>
 
 </body>
+
 </html>

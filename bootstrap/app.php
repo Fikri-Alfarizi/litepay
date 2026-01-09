@@ -17,6 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'verify.signature' => \App\Http\Middleware\VerifySignature::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+
+        // Redirect unauthenticated users based on the route
+        $middleware->redirectGuestsTo(function ($request) {
+            // If accessing store or customer routes, redirect to customer login
+            if ($request->is('store/*') || $request->is('customer/*') || $request->is('checkout/*')) {
+                return route('customer.login');
+            }
+            // Otherwise redirect to admin login
+            return route('login');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

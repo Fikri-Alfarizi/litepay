@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - LitePay</title>
+    <title>Sleeknote Login</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* RESET & GLOBAL STYLES */
         * {
             margin: 0;
             padding: 0;
@@ -19,9 +20,10 @@
             height: 100vh;
             display: flex;
             background-color: #ffffff;
-            overflow: hidden;
+            overflow: hidden; /* Mencegah scroll */
         }
 
+        /* --- LEFT SIDE (LOGIN FORM) --- */
         .left-section {
             width: 50%;
             height: 100%;
@@ -39,12 +41,13 @@
             text-align: center;
         }
 
+        /* Logo Area */
         .brand-logo {
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 25px;
-            color: #4F46E5;
+            color: #4F46E5; /* Warna Biru Utama */
             font-weight: 700;
             font-size: 18px;
             letter-spacing: -0.5px;
@@ -70,6 +73,7 @@
             font-weight: 700;
         }
 
+        /* Google Button */
         .btn-google {
             width: 100%;
             display: flex;
@@ -96,6 +100,7 @@
             margin-right: 10px;
         }
 
+        /* Divider "OR" */
         .divider {
             display: flex;
             align-items: center;
@@ -116,6 +121,7 @@
         .divider::before { margin-right: 15px; }
         .divider::after { margin-left: 15px; }
 
+        /* Form Inputs */
         .form-group {
             text-align: left;
             margin-bottom: 15px;
@@ -150,6 +156,7 @@
             background-color: white;
         }
 
+        /* Utility Links (Remember me / Forgot password) */
         .form-utilities {
             display: flex;
             justify-content: space-between;
@@ -174,13 +181,14 @@
         }
 
         .forgot-link {
-            color: #EC4899;
+            color: #EC4899; /* Warna Pink kemerahan sesuai gambar */
             text-decoration: none;
             font-weight: 500;
         }
 
         .forgot-link:hover { text-decoration: underline; }
 
+        /* Login Button */
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -199,6 +207,7 @@
             background-color: #4338CA;
         }
 
+        /* Footer Link */
         .footer-text {
             margin-top: 30px;
             font-size: 14px;
@@ -211,20 +220,11 @@
             font-weight: 500;
         }
 
-        .alert-error {
-            background-color: #FEE2E2;
-            color: #DC2626;
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-align: left;
-        }
-
+        /* --- RIGHT SIDE (INFO/ILLUSTRATION) --- */
         .right-section {
             width: 50%;
             height: 100%;
-            background-color: #EEF2FF;
+            background-color: #EEF2FF; /* Warna background biru muda */
             display: flex;
             flex-direction: column;
             position: relative;
@@ -235,7 +235,7 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: auto;
+            margin-bottom: auto; /* Push content down */
         }
 
         .academy-branding {
@@ -285,10 +285,11 @@
             background: rgba(0,0,0,0.02);
         }
 
+        /* Illustration Container */
         .illustration-container {
             flex: 1;
             display: flex;
-            align-items: flex-end;
+            align-items: flex-end; /* Align image to bottom */
             justify-content: center;
             margin-bottom: 20px;
         }
@@ -296,12 +297,14 @@
         .illustration-container img {
             max-width: 80%;
             height: auto;
+            /* Drop shadow untuk memberikan kedalaman jika gambar flat */
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.05));
         }
 
+        /* RESPONSIVE DESIGN (Optional) */
         @media (max-width: 900px) {
             .right-section {
-                display: none;
+                display: none; /* Hide right side on mobile */
             }
             .left-section {
                 width: 100%;
@@ -313,37 +316,34 @@
 
     <div class="left-section">
         <div class="login-container">
+            <div class="brand-logo">
+                <div class="logo-icon"><i class="fas fa-code"></i></div>
+                Sleeknote
+            </div>
 
             <h1>Welcome Back</h1>
 
-            @if ($errors->any())
-                <div class="alert-error">
-                    <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
-                </div>
-            @endif
-
-            <button class="btn-google" type="button">
+            <button class="btn-google" onclick="alert('Login with Google clicked')">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo">
                 Log in with Google
             </button>
 
             <div class="divider">OR LOGIN WITH EMAIL</div>
 
-            <form action="{{ route('login.submit') }}" method="POST">
-                @csrf
+            <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" name="email" class="form-control" placeholder="admin@litepay.com" value="{{ old('email') }}" required>
+                    <input type="email" class="form-control" placeholder="Email Address" required>
                 </div>
                 
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    <input type="password" class="form-control" placeholder="Password" required>
                 </div>
 
                 <div class="form-utilities">
                     <label class="checkbox-group">
-                        <input type="checkbox" name="remember" checked> Keep me logged in
+                        <input type="checkbox" checked> Keep me logged in
                     </label>
                     <a href="#" class="forgot-link">Forgot your password?</a>
                 </div>
@@ -352,7 +352,7 @@
             </form>
 
             <div class="footer-text">
-                Don't have an account? <a href="{{ route('register') }}">Sign up</a>
+                Don't have an account? <a href="#">Sign up</a>
             </div>
         </div>
     </div>
@@ -361,17 +361,40 @@
         <div class="right-header">
             <div class="academy-branding">
                 <div class="academy-logo">
-                    <i class="fas fa-shield-halved"></i> Payment Gateway
+                    <i class="far fa-file-alt"></i> Sleeknote Academy
                 </div>
-                <p class="academy-desc">Secure, fast, and reliable payment processing for your business. Accept payments from anywhere.</p>
-                <a href="{{ route('store.index') }}" class="btn-academy">Open Store</a>
+                <p class="academy-desc">We've got tips and tools to keep your business growing while you're out of the office.</p>
+                <button class="btn-academy">Start Academy</button>
             </div>
         </div>
 
         <div class="illustration-container">
-            <img src="{{ asset('img/working-illustration.png') }}" alt="Working Illustration">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/man-working-on-laptop-illustration-download-in-svg-png-gif-file-formats--young-boy-logo-freelancer-work-from-home-pack-people-illustrations-4357226.png" alt="Working Illustration">
         </div>
     </div>
 
+    <script>
+        function handleLogin(e) {
+            e.preventDefault(); // Mencegah reload halaman
+            
+            // Mengambil nilai input (contoh sederhana)
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+
+            // Animasi tombol saat diklik (Visual feedback)
+            const btn = e.target.querySelector('.btn-submit');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "Logging in...";
+            btn.style.opacity = "0.7";
+
+            // Simulasi loading 1 detik
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.opacity = "1";
+                alert(`Login Attempt:\nEmail: ${email}\n(Ini hanya demo frontend, tidak ada backend)`);
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
